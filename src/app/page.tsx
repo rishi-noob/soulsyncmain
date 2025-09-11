@@ -81,6 +81,20 @@ export default function AuthPage() {
     setIsLoading(true);
     // In a real app, you would create a new user in your database.
     console.log("Signing up with:", values);
+
+    // Check if user already exists
+    const existingUser = Object.values(mockUsers).find(u => u.email === values.email);
+    if (existingUser) {
+        signupForm.setError("email", { type: "manual", message: "An account with this email already exists." });
+        toast({
+            variant: "destructive",
+            title: "Sign-up Failed",
+            description: "This email is already registered. Please sign in instead.",
+        });
+        setIsLoading(false);
+        return;
+    }
+
     setTimeout(() => {
         login(values.role as UserRole, values.email, values.name);
         setIsLoading(false);
