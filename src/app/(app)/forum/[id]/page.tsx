@@ -25,6 +25,7 @@ export default function ThreadPage() {
   const [newReply, setNewReply] = useState("");
 
   useEffect(() => {
+    if (!threadId) return;
     const foundThread = mockThreads.find((t) => t.id === threadId);
     setThread(foundThread);
     if (foundThread) {
@@ -54,7 +55,7 @@ export default function ThreadPage() {
         });
         return;
     }
-    if (!user) {
+    if (!user || !isAuthenticated) {
         toast({
             variant: "destructive",
             title: "Not Logged In",
