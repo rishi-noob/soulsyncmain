@@ -13,7 +13,7 @@ import { useState } from "react";
 import type { Message } from "@/lib/data";
 
 export default function ThreadPage({ params }: { params: { id: string } }) {
-  const { user, role } = useAuth();
+  const { user, role, isAuthenticated } = useAuth();
   const thread = mockThreads.find((t) => t.id === params.id);
   const [messages, setMessages] = useState<Message[]>(mockMessages.filter((m) => m.threadId === params.id));
   const [newReply, setNewReply] = useState("");
@@ -97,27 +97,29 @@ export default function ThreadPage({ params }: { params: { id: string } }) {
             </div>
           </Card>
         ))}
-
-        <Card>
-            <CardContent className="p-4">
-                <div className="flex items-start gap-4">
-                     <Avatar>
-                        <AvatarImage src={user?.avatarUrl} />
-                        <AvatarFallback>Me</AvatarFallback>
-                    </Avatar>
-                    <div className="w-full space-y-2">
-                        <Textarea 
-                            placeholder="Write your reply..."
-                            value={newReply}
-                            onChange={(e) => setNewReply(e.target.value)}
-                        />
-                        <div className="flex justify-end">
-                            <Button onClick={handlePostReply} disabled={!newReply.trim()}><Send className="h-4 w-4 mr-2"/> Post Reply</Button>
+        
+        {isAuthenticated && user && (
+            <Card>
+                <CardContent className="p-4">
+                    <div className="flex items-start gap-4">
+                        <Avatar>
+                            <AvatarImage src={user.avatarUrl} />
+                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="w-full space-y-2">
+                            <Textarea 
+                                placeholder="Write your reply..."
+                                value={newReply}
+                                onChange={(e) => setNewReply(e.target.value)}
+                            />
+                            <div className="flex justify-end">
+                                <Button onClick={handlePostReply} disabled={!newReply.trim()}><Send className="h-4 w-4 mr-2"/> Post Reply</Button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+        )}
       </div>
     </div>
   );
