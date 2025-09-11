@@ -1,7 +1,8 @@
 
+
 "use client";
 
-import { BrainCircuit } from "lucide-react";
+import { BrainCircuit, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
@@ -37,6 +38,8 @@ export default function AuthPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -135,7 +138,29 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
+                          <div className="relative">
+                            <Input
+                              type={showLoginPassword ? "text" : "password"}
+                              placeholder="••••••••"
+                              {...field}
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute inset-y-0 right-0 h-full px-3"
+                              onClick={() => setShowLoginPassword((prev) => !prev)}
+                            >
+                              {showLoginPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                              <span className="sr-only">
+                                {showLoginPassword ? "Hide password" : "Show password"}
+                              </span>
+                            </Button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -194,7 +219,29 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="Must be 8+ characters" {...field} />
+                           <div className="relative">
+                            <Input
+                              type={showSignupPassword ? "text" : "password"}
+                              placeholder="Must be 8+ characters"
+                              {...field}
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute inset-y-0 right-0 h-full px-3"
+                              onClick={() => setShowSignupPassword((prev) => !prev)}
+                            >
+                              {showSignupPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                               <span className="sr-only">
+                                {showSignupPassword ? "Hide password" : "Show password"}
+                              </span>
+                            </Button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
