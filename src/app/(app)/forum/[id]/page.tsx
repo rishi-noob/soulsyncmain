@@ -15,8 +15,9 @@ import { useParams } from "next/navigation";
 
 export default function ThreadPage() {
   const params = useParams();
-  const { user, role, isAuthenticated } = useAuth();
   const threadId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { user, role, isAuthenticated } = useAuth();
+  
   const thread = mockThreads.find((t) => t.id === threadId);
   const [messages, setMessages] = useState<Message[]>(mockMessages.filter((m) => m.threadId === threadId));
   const [newReply, setNewReply] = useState("");
