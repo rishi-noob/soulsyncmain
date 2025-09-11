@@ -50,20 +50,33 @@ export default function ChatbotPage() {
     if (!input.trim()) return;
 
     const userMessage: Message = { sender: "user", text: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const currentMessages = [...messages, userMessage];
+    setMessages(currentMessages);
     setInput("");
     setIsLoading(true);
 
     try {
       // In a real app, this data would come from your database
-      const academicDeadlines = mockAcademicEvents.map(e => `${e.title} on ${e.date.toLocaleDateString()}`).join(', ');
+      const academicDeadlines = mockAcademicEvents
+        .filter(e => e.date > new Date())
+        .map(e => e.title)
+        .join(', ');
+        
       // Use the last 7 days of mood data for context
-      const recentMoodData = mockMoodData.slice(-7).map(m => `On ${m.date}, mood was ${m.intensity}/5`).join('; ');
+      const recentMoodData = mockMoodData
+        .slice(-7)
+        .map(m => `On ${new Date(m.date).toLocaleDateString()}, mood was ${m.intensity}/5`)
+        .join('; ');
+      
+      const chatHistory = currentMessages
+        .slice(-6) // Get user's message plus last 5 messages
+        .map(m => `${m.sender}: ${m.text || m.html?.replace(/<[^>]*>?/gm, '')}`) // strip html for history
+        .join('\\n');
 
       const response: GeneratePersonalizedAdviceOutput = await generatePersonalizedAdvice({
-        moodData: recentMoodData || "User has not provided mood data yet.",
-        academicDeadlines: academicDeadlines,
-        chatHistory: messages.slice(-5).map(m => `${m.sender}: ${m.text || m.html}`).join('\n')
+        moodData: recentMoodData || "No recent mood data.",
+        academicDeadlines: academicDeadlines || "No upcoming deadlines.",
+        chatHistory: chatHistory
       });
 
       setMessages((prev) => [
