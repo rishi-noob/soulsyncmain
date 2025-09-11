@@ -7,12 +7,14 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { mockMoodData } from '@/lib/data';
+import type { MoodEntry } from '@/lib/data';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format, startOfWeek, addDays, getMonth, getYear } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/auth-context';
 
 const questions = [
-  { id: 'day', text: 'How was your day?', options: ['😃', '🙂', '😐', '😔', '😢'] },
+  { id: 'day', text: 'How was your day?', options: ['😃', '🙂', '😐', '😔', '😢'], values: [5, 4, 3, 2, 1]},
   { id: 'anxious', text: 'Did you feel anxious today?', options: ['No', 'Sometimes', 'Often'] },
   { id: 'sleep', text: 'Did you sleep well last night?', options: ['Yes', 'No'] },
   { id: 'angry', text: 'Did you feel angry at any time?', options: ['Yes', 'No'] },
@@ -21,9 +23,49 @@ const questions = [
 
 export default function MoodTrackerPage() {
     const { toast } = useToast();
+    const { user, updateUser } = useAuth();
+    const [moodLog, setMoodLog] = useState<Record<string, string>>({});
+    const [moodEntries, setMoodEntries] = useState<MoodEntry[]>(mockMoodData);
+
+    const handleValueChange = (id: string, value: string) => {
+        setMoodLog(prev => ({...prev, [id]: value}));
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        const dayRating = moodLog.day;
+        if (!dayRating) {
+             toast({
+                variant: 'destructive',
+                title: "Incomplete Log",
+                description: "Please rate how your day was before submitting.",
+            });
+            return;
+        }
+
+        const intensityIndex = questions[0].options.indexOf(dayRating);
+        const intensity = questions[0].values[intensityIndex];
+
+        const newEntry: MoodEntry = {
+            date: format(new Date(), 'yyyy-MM-dd'),
+            intensity: intensity,
+        };
+
+        // Avoid duplicate entry for the same day
+        const existingEntryIndex = moodEntries.findIndex(e => e.date === newEntry.date);
+        if (existingEntryIndex !== -1) {
+            const updatedEntries = [...moodEntries];
+            updatedEntries[existingEntryIndex] = newEntry;
+            setMoodEntries(updatedEntries);
+        } else {
+            setMoodEntries([...moodEntries, newEntry]);
+        }
+        
+        if (user) {
+            updateUser({ streak: user.streak + 1 });
+        }
+
         toast({
             title: "Mood logged successfully!",
             description: "Your mood for today has been recorded. Keep up the great work!",
@@ -43,7 +85,7 @@ export default function MoodTrackerPage() {
               {questions.map((q) => (
                 <div key={q.id}>
                   <Label className="text-base">{q.text}</Label>
-                  <RadioGroup className="mt-2 flex gap-4">
+                  <RadioGroup onValueChange={(value) => handleValueChange(q.id, value)} value={moodLog[q.id]} className="mt-2 flex gap-4">
                     {q.options.map((opt) => (
                       <Label key={opt} htmlFor={`${q.id}-${opt}`} className="cursor-pointer rounded-lg border p-3 text-2xl has-[:checked]:bg-primary/10 has-[:checked]:border-primary transition-all">
                         <RadioGroupItem value={opt} id={`${q.id}-${opt}`} className="sr-only" />
@@ -68,7 +110,7 @@ export default function MoodTrackerPage() {
             <CardDescription>A heatmap of your mood intensity over the last 3 months.</CardDescription>
           </CardHeader>
           <CardContent>
-            <MoodHeatmap />
+            <MoodHeatmap moodData={moodEntries} />
           </CardContent>
         </Card>
       </div>
@@ -76,13 +118,13 @@ export default function MoodTrackerPage() {
   );
 }
 
-function MoodHeatmap() {
+function MoodHeatmap({ moodData }: { moodData: MoodEntry[] }) {
     const today = new Date();
     const startDate = new Date();
     startDate.setDate(today.getDate() - 89); // approx 3 months
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    const moodDataByDate = mockMoodData.reduce((acc, entry) => {
+    const moodDataByDate = moodData.reduce((acc, entry) => {
         acc[entry.date] = entry.intensity;
         return acc;
     }, {} as Record<string, number>);

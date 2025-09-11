@@ -9,6 +9,8 @@ import type { JournalEntry } from '@/lib/data';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 const templates = {
     'gratitude': "What are 5 things you're grateful for today?\n1. \n2. \n3. \n4. \n5. ",
@@ -17,6 +19,7 @@ const templates = {
 };
 
 export default function JournalPage() {
+    const { toast } = useToast();
     const [entries, setEntries] = useState<JournalEntry[]>(mockJournalEntries);
     const [selectedTemplate, setSelectedTemplate] = useState<keyof typeof templates>('free_form');
     const [editorContent, setEditorContent] = useState('');
@@ -25,6 +28,33 @@ export default function JournalPage() {
         const key = value as keyof typeof templates;
         setSelectedTemplate(key);
         setEditorContent(templates[key]);
+    }
+
+    const handleSaveEntry = () => {
+        if (!editorContent.trim()) {
+            toast({
+                variant: 'destructive',
+                title: "Can't save empty entry",
+                description: "Please write something before saving.",
+            });
+            return;
+        }
+
+        const newEntry: JournalEntry = {
+            id: `journal-${Date.now()}`,
+            date: format(new Date(), "PPP"),
+            formatType: selectedTemplate,
+            content: editorContent,
+        };
+
+        setEntries([newEntry, ...entries]);
+        setEditorContent("");
+        setSelectedTemplate("free_form");
+        
+        toast({
+            title: "Journal Entry Saved",
+            description: "Your thoughts have been recorded.",
+        });
     }
   
   return (
@@ -43,7 +73,7 @@ export default function JournalPage() {
                         <CardTitle>New Entry</CardTitle>
                         <div className="flex items-center gap-4 pt-2">
                             <span className="text-sm font-medium">Use a template:</span>
-                            <Select onValueChange={handleTemplateChange} defaultValue="free_form">
+                            <Select onValueChange={handleTemplateChange} value={selectedTemplate}>
                                 <SelectTrigger className="w-[180px]">
                                     <SelectValue placeholder="Select a template" />
                                 </SelectTrigger>
@@ -63,7 +93,7 @@ export default function JournalPage() {
                             onChange={(e) => setEditorContent(e.target.value)}
                         />
                          <div className="flex justify-end mt-4">
-                            <Button>Save Entry</Button>
+                            <Button onClick={handleSaveEntry}>Save Entry</Button>
                          </div>
                     </CardContent>
                 </Card>
@@ -78,7 +108,7 @@ export default function JournalPage() {
                     <CardDescription>Review your previous thoughts.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {entries.map((entry, index) => (
+                    {entries.length > 0 ? entries.map((entry, index) => (
                         <div key={entry.id}>
                            <div className="p-3 rounded-lg hover:bg-muted/50 cursor-pointer">
                                 <p className="font-semibold capitalize">{entry.formatType.replace('_', ' ')}</p>
@@ -87,7 +117,9 @@ export default function JournalPage() {
                            </div>
                            {index < entries.length - 1 && <Separator />}
                         </div>
-                    ))}
+                    )) : (
+                        <p className="text-sm text-muted-foreground text-center pt-8">No entries yet. Start writing!</p>
+                    )}
                 </CardContent>
             </Card>
         </div>

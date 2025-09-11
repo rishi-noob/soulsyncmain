@@ -9,11 +9,14 @@ import { mockMessages, mockThreads } from "@/lib/data";
 import { Flag, Send, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import type { Message } from "@/lib/data";
 
 export default function ThreadPage({ params }: { params: { id: string } }) {
-  const { role } = useAuth();
+  const { user, role } = useAuth();
   const thread = mockThreads.find((t) => t.id === params.id);
-  const messages = mockMessages.filter((m) => m.threadId === params.id);
+  const [messages, setMessages] = useState<Message[]>(mockMessages.filter((m) => m.threadId === params.id));
+  const [newReply, setNewReply] = useState("");
 
   if (!thread) {
     return (
@@ -26,6 +29,23 @@ export default function ThreadPage({ params }: { params: { id: string } }) {
       </div>
     );
   }
+
+  const handlePostReply = () => {
+    if (!newReply.trim() || !user) return;
+
+    const reply: Message = {
+        id: `msg-${Date.now()}`,
+        threadId: params.id,
+        authorHash: `User_${user.id.substring(0,4)}`,
+        authorAvatar: user.avatarUrl,
+        authorRole: user.role,
+        text: newReply,
+        createdAt: "Just now",
+    };
+
+    setMessages([...messages, reply]);
+    setNewReply("");
+  };
 
   const roleColors: Record<UserRole, string> = {
     student: 'text-muted-foreground',
@@ -82,13 +102,17 @@ export default function ThreadPage({ params }: { params: { id: string } }) {
             <CardContent className="p-4">
                 <div className="flex items-start gap-4">
                      <Avatar>
-                        <AvatarImage src="https://picsum.photos/seed/currentUser/100/100" />
+                        <AvatarImage src={user?.avatarUrl} />
                         <AvatarFallback>Me</AvatarFallback>
                     </Avatar>
                     <div className="w-full space-y-2">
-                        <Textarea placeholder="Write your reply..."/>
+                        <Textarea 
+                            placeholder="Write your reply..."
+                            value={newReply}
+                            onChange={(e) => setNewReply(e.target.value)}
+                        />
                         <div className="flex justify-end">
-                            <Button><Send className="h-4 w-4 mr-2"/> Post Reply</Button>
+                            <Button onClick={handlePostReply} disabled={!newReply.trim()}><Send className="h-4 w-4 mr-2"/> Post Reply</Button>
                         </div>
                     </div>
                 </div>

@@ -12,6 +12,7 @@ interface AuthContextType {
   login: (role: UserRole, email?: string, name?: string) => void;
   logout: () => void;
   setRole: (role: UserRole) => void;
+  updateUser: (data: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(newUser);
     } else {
       // This is a mock login for existing users
-      const mockUser = Object.values(mockUsers).find(u => u.role === role) || mockUsers['user-1'];
+      const mockUser = Object.values(mockUsers).find(u => u.email === email) || mockUsers['user-1'];
       setUser({...mockUser, role});
     }
   };
@@ -54,13 +55,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user) {
       setUser({ ...user, role });
     }
-  }
+  };
+
+  const updateUser = (data: Partial<User>) => {
+    if (user) {
+        setUser({ ...user, ...data });
+    }
+  };
 
   const isAuthenticated = !!user;
   const role = user?.role || 'student';
 
   return (
-    <AuthContext.Provider value={{ user, role, isAuthenticated, login, logout, setRole }}>
+    <AuthContext.Provider value={{ user, role, isAuthenticated, login, logout, setRole, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
