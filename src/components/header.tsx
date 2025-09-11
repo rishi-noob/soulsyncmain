@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icons } from "@/components/icons";
@@ -7,10 +8,13 @@ import { UserNav } from "@/components/user-nav";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "./ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import { Menu } from "lucide-react";
 
 export function Header() {
   const pathname = usePathname();
   const { isAuthenticated, login } = useAuth();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const navItems = [
     { href: "/dashboard", label: "Home" },
@@ -25,10 +29,55 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center">
-        <div className="mr-4 flex">
+        <div className="mr-4 flex items-center">
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden mr-2"
+              >
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+              <div className="flex flex-col h-full">
+                <div className="flex items-center mb-8">
+                    <Link href="/" className="mr-6 flex items-center space-x-2" onClick={() => setIsSheetOpen(false)}>
+                        <Icons.logo className="h-6 w-6 text-primary" />
+                        <span className="font-bold font-headline tracking-wider">SOUL SYNC</span>
+                    </Link>
+                </div>
+                <nav className="flex flex-col gap-4">
+                  {isAuthenticated && navItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setIsSheetOpen(false)}
+                      className={cn(
+                        "transition-colors hover:text-foreground text-lg",
+                        pathname === item.href ? "text-foreground font-semibold" : "text-foreground/60"
+                      )}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+                 <div className="mt-auto">
+                    {isAuthenticated && (
+                    <Button asChild className="w-full" onClick={() => setIsSheetOpen(false)}>
+                        <Link href="/booking">Book a Session</Link>
+                    </Button>
+                    )}
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Icons.logo className="h-6 w-6 text-primary" />
-            <span className="font-bold font-headline tracking-wider">SOUL SYNC</span>
+            <span className="hidden sm:inline-block font-bold font-headline tracking-wider">SOUL SYNC</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm">
             {isAuthenticated && navItems.map((item) => (
@@ -45,9 +94,9 @@ export function Header() {
             ))}
           </nav>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex flex-1 items-center justify-end space-x-2 sm:space-x-4">
            {isAuthenticated && (
-             <Button asChild>
+             <Button asChild className="hidden sm:inline-flex">
                 <Link href="/booking">Book a Session</Link>
              </Button>
            )}
