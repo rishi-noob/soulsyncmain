@@ -13,13 +13,11 @@ export function Header() {
   const { isAuthenticated, login } = useAuth();
 
   const navItems = [
-    { href: "/dashboard", label: "Dashboard" },
+    { href: "/dashboard", label: "Home" },
     { href: "/mood-tracker", label: "Mood Tracker" },
-    { href: "/focus-tool", label: "Focus Tool" },
+    { href: "/focus-tool", label: "Resources" },
     { href: "/journal", label: "Journal" },
-    { href: "/calendar", label: "Calendar" },
-    { href: "/chatbot", label: "Chatbot" },
-    { href: "/forum", label: "Forum" },
+    { href: "/forum", label: "Peer Forum" },
   ];
 
   return (
@@ -28,7 +26,7 @@ export function Header() {
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Icons.logo className="h-6 w-6 text-primary" />
-            <span className="font-bold">SoulSync</span>
+            <span className="font-bold font-headline tracking-wider">SOUL SYNC</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm">
             {isAuthenticated && navItems.map((item) => (
@@ -49,7 +47,7 @@ export function Header() {
           {isAuthenticated ? (
             <UserNav />
           ) : (
-            <Button onClick={() => login('student')}>Login with Google</Button>
+            <Button onClick={() => login('student')}>Login/Profile</Button>
           )}
         </div>
       </div>

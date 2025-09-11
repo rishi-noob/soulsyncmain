@@ -14,12 +14,26 @@ export default function DashboardPage() {
 
   if (!isAuthenticated || !user) {
     return (
-       <div className="container mx-auto p-4 md:p-8">
-         <div className="text-center py-20">
-            <h1 className="text-4xl font-bold">Welcome to SoulSync</h1>
-            <p className="text-muted-foreground mt-2">Please log in to access your dashboard.</p>
-         </div>
-       </div>
+      <div className="container mx-auto p-4 md:p-8">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] text-center relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-background to-purple-900/20 rounded-full blur-3xl -z-10"></div>
+             <h1 className="text-5xl font-bold font-headline tracking-tight">Your Campus Mental Health Companion</h1>
+            <p className="text-muted-foreground mt-4 max-w-xl">Confidential • Supportive • Always Available</p>
+            <div className="flex gap-4 mt-8">
+                <Button asChild size="lg">
+                    <Link href="/chatbot">
+                        <Sparkles className="mr-2 h-4 w-4"/>
+                        Start Chat
+                    </Link>
+                </Button>
+                <Button asChild variant="secondary" size="lg">
+                    <a href="https://forms.gle/your-booking-form" target="_blank" rel="noopener noreferrer">
+                        Book a Session
+                    </a>
+                </Button>
+            </div>
+        </div>
+      </div>
     )
   }
 
@@ -30,7 +44,7 @@ export default function DashboardPage() {
       <div className="space-y-8">
         <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Welcome back, {user.name.split(' ')[0]}!</h1>
+                <h1 className="text-3xl font-bold tracking-tight font-headline">Welcome back, {user.name.split(' ')[0]}!</h1>
                 <p className="text-muted-foreground">Here’s your wellness snapshot for today.</p>
             </div>
             <div className="flex gap-2">
