@@ -66,7 +66,7 @@ export default function AuthPage() {
     // In a real app, you would create a new user in your database.
     console.log("Signing up with:", values);
     setTimeout(() => {
-        login(values.role as UserRole, values.email);
+        login(values.role as UserRole, values.email, values.name);
         setIsLoading(false);
     }, 1000);
   };
