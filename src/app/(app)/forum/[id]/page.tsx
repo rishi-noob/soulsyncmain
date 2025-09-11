@@ -11,11 +11,14 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import type { Message } from "@/lib/data";
+import { useParams } from "next/navigation";
 
-export default function ThreadPage({ params }: { params: { id: string } }) {
+export default function ThreadPage() {
+  const params = useParams();
   const { user, role, isAuthenticated } = useAuth();
-  const thread = mockThreads.find((t) => t.id === params.id);
-  const [messages, setMessages] = useState<Message[]>(mockMessages.filter((m) => m.threadId === params.id));
+  const threadId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const thread = mockThreads.find((t) => t.id === threadId);
+  const [messages, setMessages] = useState<Message[]>(mockMessages.filter((m) => m.threadId === threadId));
   const [newReply, setNewReply] = useState("");
 
   if (!thread) {
@@ -35,7 +38,7 @@ export default function ThreadPage({ params }: { params: { id: string } }) {
 
     const reply: Message = {
         id: `msg-${Date.now()}`,
-        threadId: params.id,
+        threadId: threadId,
         authorHash: `User_${user.id.substring(0,4)}`,
         authorAvatar: user.avatarUrl,
         authorRole: user.role,
