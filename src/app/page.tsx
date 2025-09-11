@@ -64,7 +64,8 @@ export default function AuthPage() {
     setTimeout(() => {
       // Mock validation
       if (values.email === "rishisahab@gmail.com" && values.password === "rishabhsharma") {
-          login("student", values.email);
+          const user = mockUsers['user-rishabh'];
+          login(user.role, user.email, user.name);
       } else {
         const userExists = Object.values(mockUsers).some(u => u.email === values.email);
         if (userExists) {
@@ -282,5 +283,7 @@ export default function AuthPage() {
     </div>
   );
 }
+
+    
 
     
