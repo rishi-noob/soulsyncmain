@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function BookingPage() {
     // In a real app, this would link to your actual booking system (e.g., Calendly, Google Calendar, custom backend)
-    const bookingLink = "https://calendar.google.com/calendar/appointments/schedules/your-mock-schedule-link";
+    const bookingLink = "https://forms.gle/Ls44mVKZSUhTGtXJ7";
 
     const features = [
         {
