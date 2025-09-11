@@ -15,9 +15,10 @@ export function Header() {
   const navItems = [
     { href: "/dashboard", label: "Home" },
     { href: "/mood-tracker", label: "Mood Tracker" },
-    { href: "/focus-tool", label: "Resources" },
+    { href: "/resources", label: "Resources" },
     { href: "/journal", label: "Journal" },
     { href: "/forum", label: "Peer Forum" },
+    { href: "/focus-tool", label: "Focus" },
   ];
 
   return (

@@ -9,7 +9,7 @@ interface AuthContextType {
   user: User | null;
   role: UserRole;
   isAuthenticated: boolean;
-  login: (role: UserRole) => void;
+  login: (role: UserRole, email?: string) => void;
   logout: () => void;
   setRole: (role: UserRole) => void;
 }
@@ -19,8 +19,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = (role: UserRole) => {
+  const login = (role: UserRole, email?: string) => {
     // In a real app, you'd get user data from your backend
+    if (email === 'rishisahab@gmail.com') {
+        setUser(mockUsers['user-rishabh']);
+        return;
+    }
     const mockUser = Object.values(mockUsers).find(u => u.role === role) || mockUsers['user-1'];
     setUser({...mockUser, role});
   };

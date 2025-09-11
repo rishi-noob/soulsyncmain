@@ -54,10 +54,9 @@ export default function AuthPage() {
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     // In a real app, you would verify credentials against a database.
-    // For this mock, we'll log in the first user matching any role.
     console.log("Logging in with:", values);
     setTimeout(() => {
-      login("student"); // Mock login with student role
+      login("student", values.email); // Mock login with student role
       setIsLoading(false);
     }, 1000);
   };
@@ -65,10 +64,9 @@ export default function AuthPage() {
   const handleSignup = async (values: z.infer<typeof signupSchema>) => {
     setIsLoading(true);
     // In a real app, you would create a new user in your database.
-    // For this mock, we'll just log them in with the selected role.
     console.log("Signing up with:", values);
     setTimeout(() => {
-        login(values.role as UserRole);
+        login(values.role as UserRole, values.email);
         setIsLoading(false);
     }, 1000);
   };

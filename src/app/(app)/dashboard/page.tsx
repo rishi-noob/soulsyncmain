@@ -3,7 +3,7 @@
 import { useAuth } from "@/context/auth-context";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Flame, HeartPulse, MessageSquare, Sparkles, Wind } from "lucide-react";
+import { CalendarIcon, Flame, HeartPulse, MessageSquare, Sparkles, Wind, BookOpen, BrainCircuit } from "lucide-react";
 import Link from "next/link";
 import { mockAcademicEvents } from "@/lib/data";
 import { format } from "date-fns";
@@ -15,24 +15,35 @@ export default function DashboardPage() {
   if (!isAuthenticated || !user) {
     return (
       <div className="container mx-auto p-4 md:p-8">
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] text-center relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-background to-purple-900/20 rounded-full blur-3xl -z-10"></div>
-             <h1 className="text-5xl font-bold font-headline tracking-tight">Your Campus Mental Health Companion</h1>
-            <p className="text-muted-foreground mt-4 max-w-xl">Confidential • Supportive • Always Available</p>
-            <div className="flex gap-4 mt-8">
-                <Button asChild size="lg">
-                    <Link href="/chatbot">
-                        <Sparkles className="mr-2 h-4 w-4"/>
-                        Start Chat
-                    </Link>
-                </Button>
-                <Button asChild variant="secondary" size="lg">
-                    <a href="https://forms.gle/your-booking-form" target="_blank" rel="noopener noreferrer">
-                        Book a Session
-                    </a>
-                </Button>
+          <div className="relative isolate">
+                <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
+                    <div
+                        style={{
+                            clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)'
+                        }}
+                        className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#8085ff] to-[#5438dc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+                    />
+                </div>
+                <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
+                    <div className="text-center">
+                        <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl font-headline">Your Campus Mental Health Companion</h1>
+                        <p className="mt-6 text-lg leading-8 text-gray-300">Confidential • Supportive • Always Available</p>
+                        <div className="mt-10 flex items-center justify-center gap-x-6">
+                            <Button asChild size="lg">
+                                <Link href="/chatbot">
+                                    <Sparkles className="mr-2 h-4 w-4" />
+                                    Start Chat
+                                </Link>
+                            </Button>
+                            <Button asChild variant="secondary" size="lg">
+                                <a href="https://forms.gle/your-booking-form" target="_blank" rel="noopener noreferrer">
+                                    Book a Session
+                                </a>
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
       </div>
     )
   }
@@ -86,7 +97,8 @@ export default function DashboardPage() {
               </p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="hover:bg-muted/50 transition-colors" asChild>
+            <Link href="/forum">
              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Community</CardTitle>
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
@@ -97,6 +109,7 @@ export default function DashboardPage() {
                     Join the conversation in the peer forum.
                 </p>
             </CardContent>
+            </Link>
           </Card>
         </div>
 
@@ -132,8 +145,8 @@ export default function DashboardPage() {
             <Card className="bg-primary/10 border-primary/20">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-primary">
-                        <Sparkles className="h-5 w-5"/>
-                        AI-Powered Insight
+                        <BrainCircuit className="h-5 w-5"/>
+                        First-Aid Chatbot
                     </CardTitle>
                     <CardDescription>Personalized advice just for you.</CardDescription>
                 </CardHeader>

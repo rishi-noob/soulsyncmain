@@ -26,6 +26,7 @@ export function UserNav() {
   if (!user) return null;
   
   const getInitials = (name: string) => {
+    if (!name) return "";
     const names = name.split(' ');
     if (names.length > 1) {
       return `${names[0][0]}${names[1][0]}`;
@@ -72,6 +73,8 @@ export function UserNav() {
                 <DropdownMenuRadioItem value="student">Student</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="volunteer">Volunteer</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="admin">Admin</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="counsellor">Counsellor</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="management">Management</DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuSubContent>
           </DropdownMenuPortal>

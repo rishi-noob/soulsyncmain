@@ -21,7 +21,7 @@ export type Thread = {
 };
 
 export type Message = {
-  id: string;
+  id:string;
   threadId: string;
   authorHash: string;
   authorAvatar: string;
@@ -57,9 +57,9 @@ export const mockUsers: Record<string, User> = {
     email: "alex.doe@example.com",
     avatarUrl: "https://picsum.photos/seed/avatar1/100/100",
     role: "student",
-    streak: 12,
-    focusPoints: 128,
-    treesPlanted: 5,
+    streak: 0,
+    focusPoints: 0,
+    treesPlanted: 0,
   },
   "user-2": {
     id: "user-2",
@@ -67,9 +67,9 @@ export const mockUsers: Record<string, User> = {
     email: "sam.smith@example.com",
     avatarUrl: "https://picsum.photos/seed/avatar2/100/100",
     role: "volunteer",
-    streak: 5,
-    focusPoints: 42,
-    treesPlanted: 1,
+    streak: 0,
+    focusPoints: 0,
+    treesPlanted: 0,
   },
   "user-3": {
     id: "user-3",
@@ -80,6 +80,16 @@ export const mockUsers: Record<string, User> = {
     streak: 0,
     focusPoints: 0,
     treesPlanted: 0,
+  },
+  "user-rishabh": {
+    id: "user-rishabh",
+    name: "Rishabh Sharma",
+    email: "rishisahab@gmail.com",
+    avatarUrl: "https://picsum.photos/seed/rishabh/100/100",
+    role: "student",
+    streak: 15,
+    focusPoints: 256,
+    treesPlanted: 8,
   }
 };
 
