@@ -1,0 +1,25 @@
+import { Header } from "@/components/header";
+import { RoleSelector } from "@/components/role-selector";
+import { useAuth } from "@/context/auth-context";
+
+interface AppLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function AppLayout({ children }: AppLayoutProps) {
+  // Since we can't use hooks in Server Components,
+  // we would handle auth state differently in a real app (e.g., via session cookie).
+  // For this mock, we'll assume a client-side check.
+  // A proper implementation would use middleware.
+  
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex-1">
+        {/* In a real app, first-time role selection would be enforced by middleware */}
+        <RoleSelector />
+        {children}
+      </main>
+    </div>
+  );
+}

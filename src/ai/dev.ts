@@ -1,1 +1,6 @@
-// Flows will be imported for their side effects in this file.
+import { config } from 'dotenv';
+config();
+
+import '@/ai/flows/chatbot-personalized-advice.ts';
+import '@/ai/flows/generate-wellness-reminders.ts';
+import '@/ai/flows/automoderate-forum-messages.ts';
