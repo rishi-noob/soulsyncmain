@@ -22,8 +22,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (role: UserRole, email?: string, name?: string) => {
     // In a real app, you'd get user data from your backend
-    if (email === 'rishisahab@gmail.com') {
-        setUser(mockUsers['user-rishabh']);
+    const mockUser = email ? Object.values(mockUsers).find(u => u.email === email) : null;
+
+    if (mockUser) {
+        setUser(mockUser);
         return;
     }
     
@@ -41,9 +43,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
       setUser(newUser);
     } else {
-      // This is a mock login for existing users
-      const mockUser = Object.values(mockUsers).find(u => u.email === email) || mockUsers['user-1'];
-      setUser({...mockUser, role});
+      // Fallback for generic login without email (e.g. from header button)
+      setUser({...mockUsers['user-1'], role});
     }
   };
 

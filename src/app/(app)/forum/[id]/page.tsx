@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import type { Message, Thread } from "@/lib/data";
 import { useParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { automoderateForumMessage } from "@/ai/flows/automoderate-forum-messages";
 
 export default function ThreadPage() {
   const params = useParams();
@@ -23,6 +24,7 @@ export default function ThreadPage() {
   const [thread, setThread] = useState<Thread | undefined>();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newReply, setNewReply] = useState("");
+  const [isPosting, setIsPosting] = useState(false);
 
   useEffect(() => {
     if (!threadId) return;
@@ -46,7 +48,7 @@ export default function ThreadPage() {
     );
   }
 
-  const handlePostReply = () => {
+  const handlePostReply = async () => {
     if (!newReply.trim()) {
         toast({
             variant: "destructive",
@@ -64,22 +66,47 @@ export default function ThreadPage() {
         return;
     }
 
-    const reply: Message = {
-        id: `msg-${Date.now()}`,
-        threadId: threadId,
-        authorHash: `User_${user.id.substring(0,4)}`,
-        authorAvatar: user.avatarUrl,
-        authorRole: user.role,
-        text: newReply,
-        createdAt: "Just now",
-    };
+    setIsPosting(true);
+    try {
+        const moderationResult = await automoderateForumMessage({ text: newReply });
 
-    setMessages([...messages, reply]);
-    setNewReply("");
-    toast({
-        title: "Reply Posted!",
-        description: "Your reply has been added to the thread.",
-    });
+        if (!moderationResult.allowed) {
+            toast({
+                variant: "destructive",
+                title: "Message Flagged",
+                description: `Your message was not posted. Reason: ${moderationResult.flagReason || 'Inappropriate content'}.`,
+            });
+            setIsPosting(false);
+            return;
+        }
+
+        const reply: Message = {
+            id: `msg-${Date.now()}`,
+            threadId: threadId,
+            authorHash: `User_${user.id.substring(0,4)}`,
+            authorAvatar: user.avatarUrl,
+            authorRole: user.role,
+            text: newReply,
+            createdAt: "Just now",
+        };
+
+        setMessages([...messages, reply]);
+        setNewReply("");
+        toast({
+            title: "Reply Posted!",
+            description: "Your reply has been added to the thread.",
+        });
+
+    } catch (error) {
+        console.error("Failed to post reply:", error);
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Could not post your reply. Please try again.",
+        });
+    } finally {
+        setIsPosting(false);
+    }
   };
 
   const roleColors: Record<UserRole, string> = {
@@ -146,9 +173,12 @@ export default function ThreadPage() {
                                 placeholder="Write your reply..."
                                 value={newReply}
                                 onChange={(e) => setNewReply(e.target.value)}
+                                disabled={isPosting}
                             />
                             <div className="flex justify-end">
-                                <Button onClick={handlePostReply} disabled={!newReply.trim()}><Send className="h-4 w-4 mr-2"/> Post Reply</Button>
+                                <Button onClick={handlePostReply} disabled={!newReply.trim() || isPosting}>
+                                    {isPosting ? 'Posting...' : <><Send className="h-4 w-4 mr-2"/> Post Reply</>}
+                                </Button>
                             </div>
                         </div>
                     </div>
