@@ -15,10 +15,11 @@ export function Header() {
   const navItems = [
     { href: "/dashboard", label: "Home" },
     { href: "/mood-tracker", label: "Mood Tracker" },
-    { href: "/resources", label: "Resources" },
+    { href: "/calendar", label: "Calendar" },
     { href: "/journal", label: "Journal" },
     { href: "/forum", label: "Peer Forum" },
     { href: "/focus-tool", label: "Focus" },
+    { href: "/resources", label: "Resources" },
   ];
 
   return (
@@ -44,7 +45,12 @@ export function Header() {
             ))}
           </nav>
         </div>
-        <div className="flex flex-1 items-center justify-end">
+        <div className="flex flex-1 items-center justify-end space-x-4">
+           {isAuthenticated && (
+             <Button asChild>
+                <Link href="/booking">Book a Session</Link>
+             </Button>
+           )}
           {isAuthenticated ? (
             <UserNav />
           ) : (

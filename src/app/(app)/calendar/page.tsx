@@ -18,6 +18,10 @@ import { generateWellnessReminders } from "@/ai/flows/generate-wellness-reminder
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/auth-context";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function CalendarPage() {
   const { user } = useAuth();
@@ -26,6 +30,10 @@ export default function CalendarPage() {
   const [events, setEvents] = useState<AcademicEvent[]>(mockAcademicEvents);
   const [reminders, setReminders] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newEventTitle, setNewEventTitle] = useState("");
+  const [newEventDate, setNewEventDate] = useState<Date | undefined>(new Date());
+  const [newEventType, setNewEventType] = useState<AcademicEvent['type'] | undefined>();
 
   const selectedDayEvents = events.filter(
     (event) => date && format(event.date, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
@@ -50,7 +58,6 @@ export default function CalendarPage() {
             moodEntries: mockMoodEntries
         });
         
-        // Let's add some mock reminders if AI returns empty
         if (result.reminders && result.reminders.length > 0) {
             setReminders(result.reminders);
         } else {
@@ -67,7 +74,6 @@ export default function CalendarPage() {
             title: "Error",
             description: "Could not generate wellness reminders.",
         });
-        // Mock reminders on failure for better UX
         setReminders([
             "Take a 10-minute break every hour to stretch and rest your eyes.",
             "Make sure you get at least 7-8 hours of sleep, especially before an exam.",
@@ -78,6 +84,32 @@ export default function CalendarPage() {
     }
   };
 
+  const handleAddEvent = () => {
+    if (!newEventTitle.trim() || !newEventDate || !newEventType) {
+        toast({
+            variant: "destructive",
+            title: "Incomplete Form",
+            description: "Please fill out all fields to add an event.",
+        });
+        return;
+    }
+    const newEvent: AcademicEvent = {
+        id: `evt-${Date.now()}`,
+        title: newEventTitle,
+        date: newEventDate,
+        type: newEventType
+    };
+    setEvents([...events, newEvent].sort((a,b) => a.date.getTime() - b.date.getTime()));
+    setIsDialogOpen(false);
+    setNewEventTitle("");
+    setNewEventDate(new Date());
+    setNewEventType(undefined);
+    toast({
+        title: "Event Added",
+        description: `${newEvent.title} has been added to your calendar.`
+    })
+  }
+
   return (
     <div className="container mx-auto p-4 md:p-8">
        <div className="flex items-center justify-between mb-6">
@@ -85,10 +117,51 @@ export default function CalendarPage() {
                 <h1 className="text-3xl font-bold tracking-tight">Academic Calendar</h1>
                 <p className="text-muted-foreground">Manage your deadlines and well-being.</p>
             </div>
-            <Button>
-                <PlusCircle className="mr-2 h-4 w-4"/>
-                Add Event
-            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                    <Button>
+                        <PlusCircle className="mr-2 h-4 w-4"/>
+                        Add Event
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add a New Academic Event</DialogTitle>
+                        <DialogDescription>
+                            Keep track of your assignments, exams, and other important dates.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="title" className="text-right">Title</Label>
+                            <Input id="title" value={newEventTitle} onChange={(e) => setNewEventTitle(e.target.value)} className="col-span-3" placeholder="e.g., Biology Final Exam" />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label className="text-right">Date</Label>
+                             <div className="col-span-3">
+                                <Calendar mode="single" selected={newEventDate} onSelect={setNewEventDate} className="rounded-md border" />
+                             </div>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="type" className="text-right">Type</Label>
+                            <Select onValueChange={(value) => setNewEventType(value as AcademicEvent['type'])} value={newEventType}>
+                                <SelectTrigger className="col-span-3">
+                                    <SelectValue placeholder="Select event type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="exam">Exam</SelectItem>
+                                    <SelectItem value="assignment">Assignment</SelectItem>
+                                    <SelectItem value="presentation">Presentation</SelectItem>
+                                    <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" onClick={handleAddEvent}>Add Event</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
