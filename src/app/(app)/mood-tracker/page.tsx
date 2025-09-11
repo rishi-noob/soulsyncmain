@@ -46,30 +46,34 @@ export default function MoodTrackerPage() {
 
         const intensityIndex = questions[0].options.indexOf(dayRating);
         const intensity = questions[0].values[intensityIndex];
+        
+        const todayDate = format(new Date(), 'yyyy-MM-dd');
 
         const newEntry: MoodEntry = {
-            date: format(new Date(), 'yyyy-MM-dd'),
+            date: todayDate,
             intensity: intensity,
         };
 
-        // Avoid duplicate entry for the same day
         const existingEntryIndex = moodEntries.findIndex(e => e.date === newEntry.date);
+        
         if (existingEntryIndex !== -1) {
             const updatedEntries = [...moodEntries];
             updatedEntries[existingEntryIndex] = newEntry;
             setMoodEntries(updatedEntries);
+            toast({
+                title: "Mood updated!",
+                description: "Your mood for today has been updated.",
+            });
         } else {
             setMoodEntries([...moodEntries, newEntry]);
+            if (user) {
+                updateUser({ streak: user.streak + 1 });
+            }
+            toast({
+                title: "Mood logged successfully!",
+                description: "Your mood for today has been recorded. Keep up the great work!",
+            });
         }
-        
-        if (user) {
-            updateUser({ streak: user.streak + 1 });
-        }
-
-        toast({
-            title: "Mood logged successfully!",
-            description: "Your mood for today has been recorded. Keep up the great work!",
-        });
     }
 
   return (
