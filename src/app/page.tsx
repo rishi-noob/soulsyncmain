@@ -16,6 +16,8 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UserRole } from "@/context/auth-context";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { mockUsers } from "@/lib/data";
+import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -33,6 +35,7 @@ const signupSchema = z.object({
 export default function AuthPage() {
   const { login, isAuthenticated } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
@@ -56,7 +59,26 @@ export default function AuthPage() {
     // In a real app, you would verify credentials against a database.
     console.log("Logging in with:", values);
     setTimeout(() => {
-      login("student", values.email); // Mock login with student role
+      // Mock validation
+      if (values.email === "rishisahab@gmail.com" && values.password === "rishabhsharma") {
+          login("student", values.email);
+      } else {
+        const userExists = Object.values(mockUsers).some(u => u.email === values.email);
+        if (userExists) {
+           // This is a simplified mock login. In a real app, you'd check hashed passwords.
+           const user = Object.values(mockUsers).find(u => u.email === values.email);
+           if (user) {
+            login(user.role, user.email, user.name);
+           }
+        } else {
+            loginForm.setError("email", { type: "manual", message: "No account found with this email." });
+            toast({
+                variant: "destructive",
+                title: "Login Failed",
+                description: "Invalid credentials. Please try again.",
+            });
+        }
+      }
       setIsLoading(false);
     }, 1000);
   };
