@@ -1,6 +1,6 @@
 import { Header } from "@/components/header";
 import { RoleSelector } from "@/components/role-selector";
-import { useAuth } from "@/context/auth-context";
+import { AuthGuard } from "@/components/auth-guard";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -13,13 +13,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
   // A proper implementation would use middleware.
   
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-      <main className="flex-1">
-        {/* In a real app, first-time role selection would be enforced by middleware */}
-        <RoleSelector />
-        {children}
-      </main>
-    </div>
+    <AuthGuard>
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex-1">
+          {/* In a real app, first-time role selection would be enforced by middleware */}
+          <RoleSelector />
+          {children}
+        </main>
+      </div>
+    </AuthGuard>
   );
 }
