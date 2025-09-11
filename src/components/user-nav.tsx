@@ -10,18 +10,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuPortal,
-  DropdownMenuSubContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
-import { useAuth, UserRole } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 import Link from "next/link";
 
 export function UserNav() {
-  const { user, logout, role, setRole } = useAuth();
+  const { user, logout, role } = useAuth();
 
   if (!user) return null;
   
@@ -64,21 +58,6 @@ export function UserNav() {
              </DropdownMenuItem>
           )}
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Switch Role (Dev)</DropdownMenuSubTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuSubContent>
-              <DropdownMenuRadioGroup value={role} onValueChange={(value) => setRole(value as UserRole)}>
-                <DropdownMenuRadioItem value="student">Student</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="volunteer">Volunteer</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="admin">Admin</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="counsellor">Counsellor</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="management">Management</DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuSubContent>
-          </DropdownMenuPortal>
-        </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>
           Log out
