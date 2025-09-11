@@ -107,8 +107,8 @@ export default function ChatbotPage() {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-8 flex justify-center">
-      <Card className="w-full max-w-3xl h-[70vh] flex flex-col">
+    <div className="flex-1 flex flex-col p-4">
+      <Card className="w-full flex-1 flex flex-col">
         <CardHeader className="flex flex-row items-center gap-4">
             <Avatar>
                 <AvatarImage src="https://picsum.photos/seed/ai-bot/100/100" data-ai-hint="illustration robot" />
@@ -121,7 +121,7 @@ export default function ChatbotPage() {
         </CardHeader>
         <CardContent className="flex-1 overflow-hidden p-0">
           <ScrollArea className="h-full p-6" ref={scrollAreaRef}>
-            <div className="space-y-6">
+            <div className="space-y-6 max-w-3xl mx-auto w-full">
               {messages.map((message, index) => (
                 <div
                   key={index}
@@ -179,7 +179,7 @@ export default function ChatbotPage() {
           </ScrollArea>
         </CardContent>
         <CardFooter className="p-4 border-t">
-          <form onSubmit={handleSendMessage} className="flex w-full items-start gap-2">
+          <form onSubmit={handleSendMessage} className="flex w-full items-start gap-2 max-w-3xl mx-auto">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
