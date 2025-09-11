@@ -108,7 +108,7 @@ export default function ChatbotPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8 flex justify-center">
-      <Card className="w-full max-w-3xl h-[80vh] flex flex-col">
+      <Card className="w-full max-w-3xl h-[70vh] flex flex-col">
         <CardHeader className="flex flex-row items-center gap-4">
             <Avatar>
                 <AvatarImage src="https://picsum.photos/seed/ai-bot/100/100" data-ai-hint="illustration robot" />
