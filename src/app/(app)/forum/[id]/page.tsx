@@ -9,18 +9,29 @@ import { mockMessages, mockThreads } from "@/lib/data";
 import { Flag, Send, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import type { Message } from "@/lib/data";
+import { useState, useEffect } from "react";
+import type { Message, Thread } from "@/lib/data";
 import { useParams } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ThreadPage() {
   const params = useParams();
+  const { toast } = useToast();
   const threadId = Array.isArray(params.id) ? params.id[0] : params.id;
   const { user, role, isAuthenticated } = useAuth();
   
-  const thread = mockThreads.find((t) => t.id === threadId);
-  const [messages, setMessages] = useState<Message[]>(mockMessages.filter((m) => m.threadId === threadId));
+  const [thread, setThread] = useState<Thread | undefined>();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newReply, setNewReply] = useState("");
+
+  useEffect(() => {
+    const foundThread = mockThreads.find((t) => t.id === threadId);
+    setThread(foundThread);
+    if (foundThread) {
+      const threadMessages = mockMessages.filter((m) => m.threadId === threadId);
+      setMessages(threadMessages);
+    }
+  }, [threadId]);
 
   if (!thread) {
     return (
@@ -35,7 +46,22 @@ export default function ThreadPage() {
   }
 
   const handlePostReply = () => {
-    if (!newReply.trim() || !user) return;
+    if (!newReply.trim()) {
+        toast({
+            variant: "destructive",
+            title: "Empty Reply",
+            description: "You can't post an empty reply.",
+        });
+        return;
+    }
+    if (!user) {
+        toast({
+            variant: "destructive",
+            title: "Not Logged In",
+            description: "You must be logged in to post a reply.",
+        });
+        return;
+    }
 
     const reply: Message = {
         id: `msg-${Date.now()}`,
@@ -49,6 +75,10 @@ export default function ThreadPage() {
 
     setMessages([...messages, reply]);
     setNewReply("");
+    toast({
+        title: "Reply Posted!",
+        description: "Your reply has been added to the thread.",
+    });
   };
 
   const roleColors: Record<UserRole, string> = {
@@ -88,7 +118,7 @@ export default function ThreadPage() {
                 </div>
                 <p className="mt-2 text-sm">{message.text}</p>
                  <div className="flex items-center gap-2 mt-3">
-                    {role === 'volunteer' && (
+                    {(role === 'admin' || role === 'volunteer') && (
                         <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
                             <Trash2 className="h-4 w-4 mr-1"/> Delete
                         </Button>

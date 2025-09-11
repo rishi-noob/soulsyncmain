@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { BrainCircuit, Eye, EyeOff } from "lucide-react";
@@ -62,18 +60,11 @@ export default function AuthPage() {
     // In a real app, you would verify credentials against a database.
     console.log("Logging in with:", values);
     setTimeout(() => {
-      // Mock validation
-      if (values.email === "rishisahab@gmail.com" && values.password === "rishabhsharma") {
-          const user = mockUsers['user-rishabh'];
-          login(user.role, user.email, user.name);
-      } else {
-        const userExists = Object.values(mockUsers).some(u => u.email === values.email);
-        if (userExists) {
-           // This is a simplified mock login. In a real app, you'd check hashed passwords.
-           const user = Object.values(mockUsers).find(u => u.email === values.email);
-           if (user) {
+        const user = Object.values(mockUsers).find(u => u.email === values.email);
+        
+        // This is a simplified mock login. In a real app, you'd check hashed passwords.
+        if (user) {
             login(user.role, user.email, user.name);
-           }
         } else {
             loginForm.setError("email", { type: "manual", message: "No account found with this email." });
             toast({
@@ -82,7 +73,6 @@ export default function AuthPage() {
                 description: "Invalid credentials. Please try again.",
             });
         }
-      }
       setIsLoading(false);
     }, 1000);
   };
@@ -283,7 +273,3 @@ export default function AuthPage() {
     </div>
   );
 }
-
-    
-
-    

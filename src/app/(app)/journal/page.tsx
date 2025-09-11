@@ -45,7 +45,7 @@ export default function JournalPage() {
         if (selectedEntry) {
             // Update existing entry
             const updatedEntries = entries.map(entry => 
-                entry.id === selectedEntry.id ? { ...entry, content: editorContent, formatType: selectedTemplate } : entry
+                entry.id === selectedEntry.id ? { ...entry, content: editorContent, formatType: selectedEntry.formatType } : entry
             );
             setEntries(updatedEntries);
             toast({

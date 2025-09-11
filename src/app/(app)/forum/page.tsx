@@ -14,23 +14,41 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/context/auth-context";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ForumPage() {
     const { user } = useAuth();
+    const { toast } = useToast();
     const [threads, setThreads] = useState<Thread[]>(mockThreads);
     const [newThreadTitle, setNewThreadTitle] = useState("");
     const [newThreadContent, setNewThreadContent] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const handleCreateThread = () => {
-        if (!newThreadTitle.trim() || !newThreadContent.trim() || !user) return;
+        if (!user) {
+            toast({
+                variant: "destructive",
+                title: "Not Logged In",
+                description: "You need to be logged in to create a thread.",
+            });
+            return;
+        }
+
+        if (!newThreadTitle.trim() || !newThreadContent.trim()) {
+            toast({
+                variant: "destructive",
+                title: "Incomplete Form",
+                description: "Please provide both a title and content for your thread.",
+            });
+            return;
+        }
 
         const newThread: Thread = {
             id: `thread-${Date.now()}`,
             title: newThreadTitle,
             authorHash: `User_${user.id.substring(0,4)}`,
             createdAt: "Just now",
-            messageCount: 1,
+            messageCount: 1, // The initial message
             isClosed: false,
         };
 
@@ -38,6 +56,10 @@ export default function ForumPage() {
         setNewThreadTitle("");
         setNewThreadContent("");
         setIsDialogOpen(false);
+        toast({
+            title: "Thread Created!",
+            description: "Your new discussion has been posted.",
+        });
     }
 
   return (
@@ -49,7 +71,7 @@ export default function ForumPage() {
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button>
+                    <Button disabled={!user}>
                         <PlusCircle className="mr-2 h-4 w-4"/>
                         New Thread
                     </Button>

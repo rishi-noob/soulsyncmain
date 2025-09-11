@@ -30,9 +30,9 @@ const forumChartConfig = {
 } satisfies ChartConfig;
 
 export default function AdminPage() {
-  const { role } = useAuth();
+  const { user, role } = useAuth();
 
-  if (role !== "admin") {
+  if (role !== "admin" || !user) {
     return (
       <div className="container mx-auto p-8 text-center">
         <h1 className="text-2xl font-bold">Access Denied</h1>
