@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
-import { mockAcademicEvents } from "@/lib/data";
+import { mockAcademicEvents, mockMoodData } from "@/lib/data";
 
 type Message = {
   sender: "user" | "assistant";
@@ -57,9 +57,11 @@ export default function ChatbotPage() {
     try {
       // In a real app, this data would come from your database
       const academicDeadlines = mockAcademicEvents.map(e => `${e.title} on ${e.date.toLocaleDateString()}`).join(', ');
+      // Use the last 7 days of mood data for context
+      const recentMoodData = mockMoodData.slice(-7).map(m => `On ${m.date}, mood was ${m.intensity}/5`).join('; ');
 
       const response: GeneratePersonalizedAdviceOutput = await generatePersonalizedAdvice({
-        moodData: "User has not provided mood data yet.",
+        moodData: recentMoodData || "User has not provided mood data yet.",
         academicDeadlines: academicDeadlines,
         chatHistory: messages.slice(-5).map(m => `${m.sender}: ${m.text || m.html}`).join('\n')
       });
