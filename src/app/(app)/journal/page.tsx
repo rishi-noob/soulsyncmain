@@ -23,11 +23,13 @@ export default function JournalPage() {
     const [entries, setEntries] = useState<JournalEntry[]>(mockJournalEntries);
     const [selectedTemplate, setSelectedTemplate] = useState<keyof typeof templates>('free_form');
     const [editorContent, setEditorContent] = useState('');
+    const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
 
     const handleTemplateChange = (value: string) => {
         const key = value as keyof typeof templates;
         setSelectedTemplate(key);
         setEditorContent(templates[key]);
+        setSelectedEntry(null);
     }
 
     const handleSaveEntry = () => {
@@ -40,21 +42,48 @@ export default function JournalPage() {
             return;
         }
 
-        const newEntry: JournalEntry = {
-            id: `journal-${Date.now()}`,
-            date: format(new Date(), "PPP"),
-            formatType: selectedTemplate,
-            content: editorContent,
-        };
+        if (selectedEntry) {
+            // Update existing entry
+            const updatedEntries = entries.map(entry => 
+                entry.id === selectedEntry.id ? { ...entry, content: editorContent, formatType: selectedTemplate } : entry
+            );
+            setEntries(updatedEntries);
+            toast({
+                title: "Journal Entry Updated",
+                description: "Your thoughts have been updated.",
+            });
 
-        setEntries([newEntry, ...entries]);
+        } else {
+            // Create new entry
+            const newEntry: JournalEntry = {
+                id: `journal-${Date.now()}`,
+                date: format(new Date(), "PPP"),
+                formatType: selectedTemplate,
+                content: editorContent,
+            };
+
+            setEntries([newEntry, ...entries]);
+            toast({
+                title: "Journal Entry Saved",
+                description: "Your thoughts have been recorded.",
+            });
+        }
+        
         setEditorContent("");
         setSelectedTemplate("free_form");
-        
-        toast({
-            title: "Journal Entry Saved",
-            description: "Your thoughts have been recorded.",
-        });
+        setSelectedEntry(null);
+    }
+
+    const handleSelectEntry = (entry: JournalEntry) => {
+        setSelectedEntry(entry);
+        setEditorContent(entry.content);
+        setSelectedTemplate(entry.formatType);
+    };
+
+    const handleNewEntry = () => {
+        setSelectedEntry(null);
+        setEditorContent("");
+        setSelectedTemplate("free_form");
     }
   
   return (
@@ -64,16 +93,19 @@ export default function JournalPage() {
                 <h1 className="text-3xl font-bold tracking-tight">Private Journal</h1>
                 <p className="text-muted-foreground">A safe space for your thoughts and reflections.</p>
             </div>
+            <Button onClick={handleNewEntry}>
+                <PlusCircle className="mr-2 h-4 w-4"/> New Entry
+            </Button>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
                 <Card>
                     <CardHeader>
-                        <CardTitle>New Entry</CardTitle>
+                        <CardTitle>{selectedEntry ? `Editing Entry from ${selectedEntry.date}` : "New Entry"}</CardTitle>
                         <div className="flex items-center gap-4 pt-2">
                             <span className="text-sm font-medium">Use a template:</span>
-                            <Select onValueChange={handleTemplateChange} value={selectedTemplate}>
+                            <Select onValueChange={handleTemplateChange} value={selectedTemplate} disabled={!!selectedEntry}>
                                 <SelectTrigger className="w-[180px]">
                                     <SelectValue placeholder="Select a template" />
                                 </SelectTrigger>
@@ -93,7 +125,7 @@ export default function JournalPage() {
                             onChange={(e) => setEditorContent(e.target.value)}
                         />
                          <div className="flex justify-end mt-4">
-                            <Button onClick={handleSaveEntry}>Save Entry</Button>
+                            <Button onClick={handleSaveEntry}>{selectedEntry ? 'Update Entry' : 'Save Entry'}</Button>
                          </div>
                     </CardContent>
                 </Card>
@@ -110,7 +142,10 @@ export default function JournalPage() {
                 <CardContent className="space-y-4">
                     {entries.length > 0 ? entries.map((entry, index) => (
                         <div key={entry.id}>
-                           <div className="p-3 rounded-lg hover:bg-muted/50 cursor-pointer">
+                           <div 
+                                className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedEntry?.id === entry.id ? 'bg-muted' : 'hover:bg-muted/50'}`}
+                                onClick={() => handleSelectEntry(entry)}
+                            >
                                 <p className="font-semibold capitalize">{entry.formatType.replace('_', ' ')}</p>
                                 <p className="text-sm text-muted-foreground truncate">{entry.content}</p>
                                 <p className="text-xs text-muted-foreground mt-1">{entry.date}</p>
