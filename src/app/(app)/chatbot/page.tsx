@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
+import { mockAcademicEvents } from "@/lib/data";
 
 type Message = {
   sender: "user" | "assistant";
@@ -42,13 +43,13 @@ export default function ChatbotPage() {
 
     try {
       // In a real app, this data would come from your database
-      const mockData = {
-        moodData: "User reported feeling anxious and having trouble sleeping.",
-        academicDeadlines: "Upcoming psychology exam in 3 days.",
-        chatHistory: messages.slice(-5).map(m => `${m.sender}: ${m.text || '...'}`).join('\n')
-      };
+      const academicDeadlines = mockAcademicEvents.map(e => `${e.title} on ${e.date.toLocaleDateString()}`).join(', ');
 
-      const response: GeneratePersonalizedAdviceOutput = await generatePersonalizedAdvice(mockData);
+      const response: GeneratePersonalizedAdviceOutput = await generatePersonalizedAdvice({
+        moodData: "User has not provided mood data yet.",
+        academicDeadlines: academicDeadlines,
+        chatHistory: messages.slice(-5).map(m => `${m.sender}: ${m.text || m.html}`).join('\n')
+      });
 
       setMessages((prev) => [
         ...prev,
@@ -83,7 +84,7 @@ export default function ChatbotPage() {
       <Card className="w-full max-w-3xl h-[80vh] flex flex-col">
         <CardHeader className="flex flex-row items-center gap-4">
             <Avatar>
-                <AvatarImage src="https://picsum.photos/seed/ai-bot/100/100" />
+                <AvatarImage src="https://picsum.photos/seed/ai-bot/100/100" data-ai-hint="illustration robot" />
                 <AvatarFallback>AI</AvatarFallback>
             </Avatar>
             <div>
@@ -104,7 +105,7 @@ export default function ChatbotPage() {
                 >
                   {message.sender === "assistant" && (
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="https://picsum.photos/seed/ai-bot/100/100" />
+                      <AvatarImage src="https://picsum.photos/seed/ai-bot/100/100" data-ai-hint="illustration robot" />
                       <AvatarFallback>AI</AvatarFallback>
                     </Avatar>
                   )}
@@ -144,7 +145,7 @@ export default function ChatbotPage() {
               {isLoading && (
                  <div className="flex items-start gap-4 justify-start">
                      <Avatar className="h-8 w-8">
-                         <AvatarImage src="https://picsum.photos/seed/ai-bot/100/100" />
+                         <AvatarImage src="https://picsum.photos/seed/ai-bot/100/100" data-ai-hint="illustration robot" />
                          <AvatarFallback>AI</AvatarFallback>
                      </Avatar>
                      <div className="bg-muted rounded-lg p-3 text-sm">

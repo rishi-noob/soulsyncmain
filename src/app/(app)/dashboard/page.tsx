@@ -13,6 +13,7 @@ export default function DashboardPage() {
   const { user, isAuthenticated } = useAuth();
 
   if (!isAuthenticated || !user) {
+    // This view is for unauthenticated users, pointing them to sign in.
     return (
       <div className="container mx-auto p-4 md:p-8">
           <div className="relative isolate">
@@ -29,16 +30,10 @@ export default function DashboardPage() {
                         <h1 className="text-4xl font-bold tracking-tight sm:text-6xl font-headline">Your Campus Mental Health Companion</h1>
                         <p className="mt-6 text-lg leading-8 text-muted-foreground">Confidential • Supportive • Always Available</p>
                         <div className="mt-10 flex items-center justify-center gap-x-6">
-                            <Button asChild size="lg">
-                                <Link href="/chatbot">
-                                    <Sparkles className="mr-2 h-4 w-4" />
-                                    Start Chat
+                           <Button asChild size="lg">
+                                <Link href="/">
+                                    Sign In to Get Started
                                 </Link>
-                            </Button>
-                            <Button asChild variant="secondary" size="lg">
-                                <a href="https://forms.gle/your-booking-form" target="_blank" rel="noopener noreferrer">
-                                    Book a Session
-                                </a>
                             </Button>
                         </div>
                     </div>
@@ -152,7 +147,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent className="flex flex-col items-center text-center">
                      <Avatar className="w-16 h-16 mb-4">
-                        <AvatarImage src="https://picsum.photos/seed/ai-bot/100/100" />
+                        <AvatarImage src="https://picsum.photos/seed/ai-bot/100/100" data-ai-hint="illustration robot" />
                         <AvatarFallback>AI</AvatarFallback>
                     </Avatar>
                     <p className="text-sm text-foreground/80 mb-4">Feeling overwhelmed by your upcoming {upcomingEvents[0].type}? Let's break it down together. Chat with me for personalized strategies.</p>
