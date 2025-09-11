@@ -26,8 +26,8 @@ export default function DashboardPage() {
                 </div>
                 <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
                     <div className="text-center">
-                        <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl font-headline">Your Campus Mental Health Companion</h1>
-                        <p className="mt-6 text-lg leading-8 text-gray-300">Confidential • Supportive • Always Available</p>
+                        <h1 className="text-4xl font-bold tracking-tight sm:text-6xl font-headline">Your Campus Mental Health Companion</h1>
+                        <p className="mt-6 text-lg leading-8 text-muted-foreground">Confidential • Supportive • Always Available</p>
                         <div className="mt-10 flex items-center justify-center gap-x-6">
                             <Button asChild size="lg">
                                 <Link href="/chatbot">
@@ -97,8 +97,8 @@ export default function DashboardPage() {
               </p>
             </CardContent>
           </Card>
-          <Card className="hover:bg-muted/50 transition-colors" asChild>
-            <Link href="/forum">
+          <Card className="hover:bg-muted/50 transition-colors">
+            <Link href="/forum" className="block h-full">
              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Community</CardTitle>
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
