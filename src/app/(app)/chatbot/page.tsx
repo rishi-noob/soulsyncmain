@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { generatePersonalizedAdvice, GeneratePersonalizedAdviceOutput } from "@/ai/flows/chatbot-personalized-advice";
-import { Paperclip, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
@@ -17,7 +17,6 @@ type Message = {
   sender: "user" | "assistant";
   text?: string;
   html?: string;
-  coping_steps?: string[];
 };
 
 export default function ChatbotPage() {
@@ -31,6 +30,20 @@ export default function ChatbotPage() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+        // Not a great solution, but it works for now
+        setTimeout(() => {
+            const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+            if (viewport) {
+                viewport.scrollTop = viewport.scrollHeight;
+            }
+        }, 100);
+    }
+  }, [messages]);
+
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +69,6 @@ export default function ChatbotPage() {
         {
           sender: "assistant",
           html: response.message_html,
-          coping_steps: response.coping_steps,
         },
       ]);
     } catch (error) {
@@ -93,7 +105,7 @@ export default function ChatbotPage() {
             </div>
         </CardHeader>
         <CardContent className="flex-1 overflow-hidden p-0">
-          <ScrollArea className="h-full p-6">
+          <ScrollArea className="h-full p-6" ref={scrollAreaRef}>
             <div className="space-y-6">
               {messages.map((message, index) => (
                 <div
@@ -120,24 +132,15 @@ export default function ChatbotPage() {
                     {message.text && <p>{message.text}</p>}
                     {message.html && (
                       <div
-                        className="prose prose-sm dark:prose-invert"
+                        className="prose prose-sm dark:prose-invert max-w-none"
                         dangerouslySetInnerHTML={{ __html: message.html }}
                       />
-                    )}
-                    {message.coping_steps && message.coping_steps.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {message.coping_steps.map((step, i) => (
-                          <Button key={i} variant="secondary" size="sm">
-                            {step}
-                          </Button>
-                        ))}
-                      </div>
                     )}
                   </div>
                    {message.sender === "user" && user && (
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={user.avatarUrl} />
-                      <AvatarFallback>U</AvatarFallback>
+                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                   )}
                 </div>
@@ -180,9 +183,6 @@ export default function ChatbotPage() {
               <span className="sr-only">Send</span>
             </Button>
           </form>
-          <p className="text-xs text-muted-foreground text-center w-full px-4 absolute bottom-2 left-0">
-            Disclaimer: This is a supportive aid, not a substitute for professional diagnosis.
-          </p>
         </CardFooter>
       </Card>
     </div>
