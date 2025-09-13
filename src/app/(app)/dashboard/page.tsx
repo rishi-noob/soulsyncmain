@@ -3,17 +3,17 @@
 import { useAuth } from "@/context/auth-context";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Flame, HeartPulse, MessageSquare, Sparkles, Wind, BookOpen, BrainCircuit } from "lucide-react";
+import { CalendarIcon, Flame, HeartPulse, MessageSquare, Sparkles, Wind, BookOpen, BrainCircuit, Users, BookCopy, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { mockAcademicEvents } from "@/lib/data";
+import { mockAcademicEvents, mockThreads } from "@/lib/data";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 
 export default function DashboardPage() {
   const { user, isAuthenticated } = useAuth();
 
   if (!isAuthenticated || !user) {
-    // This view is for unauthenticated users, pointing them to sign in.
     return (
       <div className="container mx-auto p-4 md:p-8">
           <div className="relative isolate">
@@ -44,118 +44,130 @@ export default function DashboardPage() {
   }
 
   const upcomingEvents = mockAcademicEvents.slice(0, 2);
+  const latestThread = mockThreads[0];
 
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="space-y-8">
         <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight font-headline">Welcome back, {user.name.split(' ')[0]}!</h1>
-                <p className="text-muted-foreground">Here’s your wellness snapshot for today.</p>
+                <h1 className="text-3xl font-bold tracking-tight font-headline">Hello, {user.name.split(' ')[0]}!</h1>
+                <p className="text-muted-foreground">Ready to start your day with a clear mind?</p>
             </div>
             <div className="flex gap-2">
                  <Button asChild variant="outline">
                     <Link href="/mood-tracker">
-                        <HeartPulse className="mr-2 h-4 w-4"/> Log Mood
-                    </Link>
-                </Button>
-                <Button asChild>
-                    <Link href="/focus-tool">
-                        <Wind className="mr-2 h-4 w-4"/> Start Focus Session
+                        <HeartPulse className="mr-2 h-4 w-4"/> Log Today's Mood
                     </Link>
                 </Button>
             </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Mood Streak</CardTitle>
-              <Flame className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{user.streak} days</div>
-              <p className="text-xs text-muted-foreground">
-                Keep it up! Consistency is key.
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Focus Points</CardTitle>
-              <Sparkles className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{user.focusPoints}</div>
-              <p className="text-xs text-muted-foreground">
-                Total trees planted: {user.treesPlanted}
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="hover:bg-muted/50 transition-colors">
-            <Link href="/forum" className="block h-full">
-             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Community</CardTitle>
-                <MessageSquare className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold">Connect & Share</div>
-                 <p className="text-xs text-muted-foreground">
-                    Join the conversation in the peer forum.
-                </p>
-            </CardContent>
-            </Link>
-          </Card>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column */}
+            <div className="lg:col-span-2 space-y-6">
+                <Card className="bg-gradient-to-br from-primary/20 to-primary/5 border-primary/20 p-8 flex flex-col md:flex-row items-center gap-8">
+                    <div className="flex-1">
+                        <h2 className="text-2xl font-bold font-headline text-primary-foreground">Feeling Overwhelmed?</h2>
+                        <p className="text-primary-foreground/80 mt-2 mb-4">Let's break it down together. Chat with our AI assistant for personalized strategies to navigate your day.</p>
+                        <Button asChild>
+                            <Link href="/chatbot">
+                                <Sparkles className="mr-2"/>
+                                Chat with AI Assistant
+                            </Link>
+                        </Button>
+                    </div>
+                    <Image src="/hero-icon.svg" alt="Wellness" width={120} height={120} data-ai-hint="abstract illustration" />
+                </Card>
 
-        <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <CalendarIcon className="h-5 w-5"/>
-                        Upcoming Deadlines
-                    </CardTitle>
-                    <CardDescription>Stay on top of your academic schedule.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <ul className="space-y-4">
-                        {upcomingEvents.map(event => (
-                            <li key={event.id} className="flex items-center space-x-4">
-                               <div className="flex-shrink-0 bg-secondary text-secondary-foreground rounded-lg w-12 h-12 flex flex-col items-center justify-center">
-                                    <span className="text-xs uppercase">{format(event.date, 'MMM')}</span>
-                                    <span className="text-lg font-bold">{format(event.date, 'd')}</span>
-                               </div>
-                               <div>
-                                    <h3 className="font-semibold">{event.title}</h3>
-                                    <p className="text-sm text-muted-foreground capitalize">{event.type}</p>
-                               </div>
-                               <Button asChild variant="ghost" size="sm" className="ml-auto">
-                                   <Link href="/calendar">View</Link>
-                               </Button>
-                            </li>
-                        ))}
-                    </ul>
-                </CardContent>
-            </Card>
-            <Card className="bg-primary/10 border-primary/20">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-primary">
-                        <BrainCircuit className="h-5 w-5"/>
-                        First-Aid Chatbot
-                    </CardTitle>
-                    <CardDescription>Personalized advice just for you.</CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center text-center">
-                     <Avatar className="w-16 h-16 mb-4">
-                        <AvatarImage src="https://picsum.photos/seed/ai-bot/100/100" data-ai-hint="illustration robot" />
-                        <AvatarFallback>AI</AvatarFallback>
-                    </Avatar>
-                    <p className="text-sm text-foreground/80 mb-4">Feeling overwhelmed by your upcoming {upcomingEvents[0].type}? Let's break it down together. Chat with me for personalized strategies.</p>
-                    <Button asChild>
-                        <Link href="/chatbot">Chat Now</Link>
-                    </Button>
-                </CardContent>
-            </Card>
+                <div className="grid md:grid-cols-2 gap-6">
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Wind />
+                                Focus Zone
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                             <p className="text-muted-foreground mb-4">Start a focus session to boost your productivity.</p>
+                              <div className="flex items-center gap-4">
+                                <div className="text-4xl font-bold">{user.focusPoints}</div>
+                                <div>
+                                    <p className="font-semibold">Focus Points</p>
+                                    <p className="text-xs text-muted-foreground">Trees planted: {user.treesPlanted}</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Flame />
+                                Mood Streak
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-muted-foreground mb-4">Log your mood daily to build a healthy habit.</p>
+                             <div className="flex items-center gap-4">
+                                <div className="text-4xl font-bold">{user.streak}</div>
+                                <div>
+                                    <p className="font-semibold">Day Streak</p>
+                                    <p className="text-xs text-muted-foreground">Keep it going!</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-6">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <BookCopy />
+                            Your Journal
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground mb-4">A private space for your thoughts. Ready to reflect?</p>
+                        <Button asChild variant="secondary" className="w-full">
+                            <Link href="/journal">Open Journal</Link>
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Users />
+                            Community Forum
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground text-sm mb-3">Latest conversation:</p>
+                        <Link href={`/forum/${latestThread.id}`} className="block p-3 rounded-md bg-muted/50 hover:bg-muted transition-colors">
+                            <p className="font-semibold truncate">{latestThread.title}</p>
+                            <p className="text-xs text-muted-foreground">{latestThread.messageCount} replies</p>
+                        </Link>
+                    </CardContent>
+                </Card>
+
+                 <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                           <ShieldCheck />
+                           Book a Session
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground mb-4">Schedule a confidential session with a professional.</p>
+                        <Button asChild variant="outline" className="w-full">
+                            <Link href="/booking">See Availability</Link>
+                        </Button>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
       </div>
     </div>

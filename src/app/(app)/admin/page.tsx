@@ -4,9 +4,10 @@ import { BarChart, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/auth-context";
 import { mockAdminStats } from '@/lib/data';
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const moodChartConfig = {
   mood: {
@@ -31,12 +32,23 @@ const forumChartConfig = {
 
 export default function AdminPage() {
   const { user, role } = useAuth();
+  const router = useRouter();
 
-  if (role !== "admin" || !user) {
+  // Redirect if not a management user
+  if (role !== "management" && role !== "admin") {
+    router.push('/dashboard');
+    return (
+       <div className="container mx-auto p-8 text-center">
+         <p>Redirecting...</p>
+      </div>
+    )
+  }
+  
+  if (!user) {
     return (
       <div className="container mx-auto p-8 text-center">
         <h1 className="text-2xl font-bold">Access Denied</h1>
-        <p className="text-muted-foreground">You do not have permission to view this page.</p>
+        <p className="text-muted-foreground">You must be logged in to view this page.</p>
       </div>
     );
   }
@@ -46,7 +58,7 @@ export default function AdminPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+                <h1 className="text-3xl font-bold tracking-tight">Management Dashboard</h1>
                 <p className="text-muted-foreground">Aggregated and anonymized platform analytics.</p>
             </div>
             <Button>

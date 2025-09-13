@@ -52,9 +52,14 @@ export function UserNav() {
           <DropdownMenuItem asChild>
             <Link href="/dashboard">Profile</Link>
           </DropdownMenuItem>
-          {role === 'admin' && (
+          {role === 'management' && (
              <DropdownMenuItem asChild>
-                <Link href="/admin">Admin Dashboard</Link>
+                <Link href="/admin">Management Dashboard</Link>
+             </DropdownMenuItem>
+          )}
+           {role === 'volunteer' && (
+             <DropdownMenuItem asChild>
+                <Link href="/volunteer">Volunteer Dashboard</Link>
              </DropdownMenuItem>
           )}
         </DropdownMenuGroup>

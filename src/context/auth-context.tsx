@@ -2,6 +2,7 @@
 
 import { User, mockUsers } from "@/lib/data";
 import { createContext, useContext, useState, ReactNode } from "react";
+import { useRouter } from "next/navigation";
 
 export type UserRole = "student" | "volunteer" | "admin" | "counsellor" | "management";
 
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   const login = (role: UserRole, email?: string, name?: string) => {
     // In a real app, you'd get user data from your backend
@@ -26,6 +28,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (mockUser) {
         setUser(mockUser);
+        if (mockUser.role === 'management') {
+          router.push('/admin');
+        } else if (mockUser.role === 'volunteer') {
+          router.push('/volunteer');
+        } else {
+          router.push('/dashboard');
+        }
         return;
     }
     
@@ -42,14 +51,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         treesPlanted: 0,
       };
       setUser(newUser);
+      if (role === 'management') {
+          router.push('/admin');
+        } else if (role === 'volunteer') {
+          router.push('/volunteer');
+        } else {
+          router.push('/dashboard');
+        }
     } else {
       // Fallback for generic login without email (e.g. from header button)
-      setUser({...mockUsers['user-1'], role});
+      const fallbackUser = {...mockUsers['user-1'], role};
+      setUser(fallbackUser);
+      if (fallbackUser.role === 'management') {
+        router.push('/admin');
+      } else if (fallbackUser.role === 'volunteer') {
+        router.push('/volunteer');
+      } else {
+        router.push('/dashboard');
+      }
     }
   };
 
   const logout = () => {
     setUser(null);
+    router.push('/');
   };
   
   const setRole = (role: UserRole) => {

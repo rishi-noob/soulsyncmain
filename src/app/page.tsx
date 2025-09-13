@@ -27,7 +27,7 @@ const signupSchema = z.object({
     name: z.string().min(2, { message: "Name must be at least 2 characters." }),
     email: z.string().email({ message: "Invalid email address." }),
     password: z.string().min(8, { message: "Password must be at least 8 characters." }),
-    role: z.enum(["student", "volunteer", "counsellor", "management"]),
+    role: z.enum(["student", "volunteer", "management"]),
 });
 
 
@@ -267,7 +267,6 @@ export default function AuthPage() {
                           <SelectContent>
                             <SelectItem value="student">Student</SelectItem>
                             <SelectItem value="volunteer">Volunteer</SelectItem>
-                            <SelectItem value="counsellor">Counsellor</SelectItem>
                             <SelectItem value="management">Management</SelectItem>
                           </SelectContent>
                         </Select>
