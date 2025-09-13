@@ -56,8 +56,7 @@ export default function AuthPage() {
 
   const handleLogin = (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
-    // In a real app, you would verify credentials against a database.
-    // This is a simplified mock login. In a real app, you'd check hashed passwords.
+    // This is a simplified mock login. In a real app, you'd also check hashed passwords.
     setTimeout(() => {
         const userExists = Object.values(allUsers).find(u => u.email === values.email);
         
@@ -78,20 +77,20 @@ export default function AuthPage() {
   const handleSignup = (values: z.infer<typeof signupSchema>) => {
     setIsLoading(true);
     
-    // Check if user already exists
-    const existingUser = Object.values(allUsers).find(u => u.email === values.email);
-    if (existingUser) {
-        signupForm.setError("email", { type: "manual", message: "An account with this email already exists." });
-        toast({
-            variant: "destructive",
-            title: "Sign-up Failed",
-            description: "This email is already registered. Please sign in instead.",
-        });
-        setIsLoading(false);
-        return;
-    }
-
+    // Check if user already exists in our persistent list from the context
     setTimeout(() => {
+        const existingUser = Object.values(allUsers).find(u => u.email === values.email);
+        if (existingUser) {
+            signupForm.setError("email", { type: "manual", message: "An account with this email already exists." });
+            toast({
+                variant: "destructive",
+                title: "Sign-up Failed",
+                description: "This email is already registered. Please sign in instead.",
+            });
+            setIsLoading(false);
+            return;
+        }
+
         const newUser: User = {
             id: `user-${Date.now()}`,
             name: values.name,
@@ -103,12 +102,18 @@ export default function AuthPage() {
             treesPlanted: 0,
         };
         
-        // Add new user to our context
+        // Add new user to our context, which saves it to localStorage
         addUser(newUser);
         
         // Log the user in
         login(newUser.email);
         setIsLoading(false);
+        
+        toast({
+            title: "Account Created!",
+            description: "Welcome to SoulSync. We're glad you're here.",
+        });
+
     }, 1000);
   };
 
