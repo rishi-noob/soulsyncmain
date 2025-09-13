@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { User, UserRole } from "@/context/auth-context";
+import { User } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
@@ -27,7 +27,8 @@ const signupSchema = z.object({
     password: z.string().min(8, { message: "Password must be at least 8 characters." }),
 });
 
-// Hardcoded passwords for privileged accounts for this mock setup
+// These are the hardcoded credentials for privileged accounts.
+// This is for demonstration purposes only. In a real app, passwords would be hashed.
 const privilegedPasswords: Record<string, string> = {
     "management@gmail.com": "management123",
     "management1@gmail.com": "management1234",
@@ -61,44 +62,36 @@ export default function AuthPage() {
 
   const handleLogin = (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
-    // This is a simplified mock login. In a real app, you'd also check hashed passwords.
     setTimeout(() => {
         const userExists = Object.values(allUsers).find(u => u.email === values.email);
         
         if (!userExists) {
             loginForm.setError("email", { type: "manual", message: "No account found with this email." });
-            toast({
-                variant: "destructive",
-                title: "Login Failed",
-                description: "Invalid credentials. Please try again.",
-            });
+            toast({ variant: "destructive", title: "Login Failed" });
             setIsLoading(false);
             return;
         }
 
-        // Check password
-        const isPrivileged = ['management', 'admin', 'volunteer'].includes(userExists.role);
         let passwordIsValid = false;
-
-        if (isPrivileged) {
-            passwordIsValid = privilegedPasswords[values.email] === values.password;
+        // Check if the user is a privileged user
+        if (userExists.role === 'management' || userExists.role === 'volunteer' || userExists.role === 'admin') {
+            // Check their password against the hardcoded list
+            if (privilegedPasswords[userExists.email] === values.password) {
+                passwordIsValid = true;
+            }
         } else if (userExists.role === 'student') {
-            // For student accounts, we are not storing passwords in this mock.
-            // In a real app, you would hash and check the password.
-            // For this demo, any password will work for student accounts once registered.
-            passwordIsValid = true; 
+            // For student accounts, any password will work for this demo once they are registered.
+            // In a real app, you would hash and compare the password.
+            passwordIsValid = true;
         }
 
         if (passwordIsValid) {
-            login(values.email);
+            login(userExists.email);
         } else {
-             loginForm.setError("password", { type: "manual", message: "Incorrect password." });
-            toast({
-                variant: "destructive",
-                title: "Login Failed",
-                description: "Invalid credentials. Please try again.",
-            });
+            loginForm.setError("password", { type: "manual", message: "Incorrect password." });
+            toast({ variant: "destructive", title: "Login Failed", description: "Invalid credentials." });
         }
+
       setIsLoading(false);
     }, 1000);
   };
@@ -106,7 +99,6 @@ export default function AuthPage() {
   const handleSignup = (values: z.infer<typeof signupSchema>) => {
     setIsLoading(true);
     
-    // Check if user already exists in our persistent list from the context
     setTimeout(() => {
         const existingUser = Object.values(allUsers).find(u => u.email === values.email);
         if (existingUser) {
@@ -131,20 +123,13 @@ export default function AuthPage() {
             treesPlanted: 0,
         };
         
-        // Add new user to our context, which saves it to localStorage
         addUser(newUser);
-        
-        // Log the user in automatically
         login(newUser.email);
         
         toast({
             title: "Account Created!",
             description: "Welcome to SoulSync. We're glad you're here.",
         });
-
-        // The loading state will be handled by the redirect
-        // setIsLoading(false);
-
     }, 1000);
   };
 
