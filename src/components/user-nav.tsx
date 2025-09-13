@@ -49,6 +49,9 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+           <DropdownMenuItem asChild>
+                <Link href="/home">Home</Link>
+            </DropdownMenuItem>
           {(role === 'admin' || role === 'management') && (
              <DropdownMenuItem asChild>
                 <Link href="/admin">Management</Link>
@@ -59,9 +62,6 @@ export function UserNav() {
                 <Link href="/volunteer">Volunteer Hub</Link>
              </DropdownMenuItem>
           )}
-          <DropdownMenuItem asChild>
-            <Link href="/dashboard">Student Dashboard</Link>
-          </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/booking">Booking</Link>
           </DropdownMenuItem>

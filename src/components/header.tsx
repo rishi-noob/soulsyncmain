@@ -16,6 +16,7 @@ export function Header() {
   const { isAuthenticated, user, role } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
+  // Define the base navigation items shared by all roles
   const baseNavItems = [
     { href: "/mood-tracker", label: "Mood Tracker" },
     { href: "/calendar", label: "Calendar" },
@@ -24,22 +25,21 @@ export function Header() {
     { href: "/focus-tool", label: "Focus" },
     { href: "/resources", label: "Resources" },
   ];
-
-  let navItems = [];
-
-  switch (role) {
-    case 'admin':
-    case 'management':
-      navItems = [{ href: "/admin", label: "Analytics" }, ...baseNavItems];
-      break;
-    case 'volunteer':
-      navItems = [{ href: "/volunteer", label: "Volunteer Hub" }, ...baseNavItems];
-      break;
-    default: // student
-      navItems = [{ href: "/dashboard", label: "Home" }, ...baseNavItems];
-      break;
-  }
   
+  // The primary navigation link now points to a role-based router page.
+  const primaryNavItem = { href: "/home", label: "Home" };
+
+  // For admin/management, add specific analytics/management links
+  const managementNavItems =
+    role === "admin" || role === "management"
+      ? [
+          { href: "/admin", label: "Analytics" },
+          { href: "/admin/users", label: "Users" },
+          { href: "/admin/moderation", label: "Moderation" },
+        ]
+      : [];
+
+  const navItems = [primaryNavItem, ...managementNavItems, ...baseNavItems];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -62,7 +62,7 @@ export function Header() {
               </SheetHeader>
               <div className="flex flex-col h-full">
                 <div className="flex items-center mb-8">
-                    <Link href="/" className="mr-6 flex items-center space-x-2" onClick={() => setIsSheetOpen(false)}>
+                    <Link href="/home" className="mr-6 flex items-center space-x-2" onClick={() => setIsSheetOpen(false)}>
                         <Icons.logo className="h-6 w-6 text-primary" />
                         <span className="font-bold font-headline tracking-wider">SOUL SYNC</span>
                     </Link>
@@ -93,7 +93,7 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          <Link href="/" className="mr-6 flex items-center space-x-2">
+          <Link href="/home" className="mr-6 flex items-center space-x-2">
             <Icons.logo className="h-6 w-6 text-primary" />
             <span className="hidden sm:inline-block font-bold font-headline tracking-wider">SOUL SYNC</span>
           </Link>
@@ -104,7 +104,9 @@ export function Header() {
                 href={item.href}
                 className={cn(
                   "transition-colors hover:text-foreground/80",
-                  pathname === item.href ? "text-foreground" : "text-foreground/60"
+                  (pathname === item.href || (item.href === "/home" && (pathname === "/dashboard" || pathname === "/admin" || pathname === "/volunteer")))
+                    ? "text-foreground"
+                    : "text-foreground/60"
                 )}
               >
                 {item.label}
