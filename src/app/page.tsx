@@ -62,6 +62,8 @@ export default function AuthPage() {
 
   const handleLogin = (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
+    
+    // Simulate network delay
     setTimeout(() => {
         const userExists = Object.values(allUsers).find(u => u.email === values.email);
         
@@ -74,65 +76,63 @@ export default function AuthPage() {
 
         let passwordIsValid = false;
         
+        // For privileged roles, check against the hardcoded password list
         if (userExists.role === 'management' || userExists.role === 'volunteer' || userExists.role === 'admin') {
             if (privilegedPasswords[userExists.email] === values.password) {
                 passwordIsValid = true;
             }
         } else if (userExists.role === 'student') {
-            passwordIsValid = true; // For demo, any password works for registered students
+            // For demo purposes, any password works for registered students
+            passwordIsValid = true;
         }
 
         if (passwordIsValid) {
+            toast({ title: "Login Successful", description: "Redirecting to your dashboard..." });
             login(userExists.email);
+            // The redirect will happen via the login function, no need to set loading to false here
         } else {
             loginForm.setError("password", { type: "manual", message: "Incorrect password." });
             toast({ variant: "destructive", title: "Login Failed", description: "Invalid credentials." });
+            setIsLoading(false);
         }
-
-      setIsLoading(false);
     }, 1000);
   };
 
   const handleSignup = (values: z.infer<typeof signupSchema>) => {
     setIsLoading(true);
-    
-    // Using a timeout to simulate a network request
-    setTimeout(() => {
-        const existingUser = Object.values(allUsers).find(u => u.email === values.email);
-        if (existingUser) {
-            signupForm.setError("email", { type: "manual", message: "An account with this email already exists." });
-            toast({
-                variant: "destructive",
-                title: "Sign-up Failed",
-                description: "This email is already registered. Please sign in instead.",
-            });
-            setIsLoading(false);
-            return;
-        }
 
-        const newUser: User = {
-            id: `user-${Date.now()}`,
-            name: values.name,
-            email: values.email,
-            avatarUrl: `https://picsum.photos/seed/${values.name}/100/100`,
-            role: "student", // All signups are students by default
-            streak: 0,
-            focusPoints: 0,
-            treesPlanted: 0,
-        };
-        
-        addUser(newUser);
-
+    const existingUser = Object.values(allUsers).find(u => u.email === values.email);
+    if (existingUser) {
+        signupForm.setError("email", { type: "manual", message: "An account with this email already exists." });
         toast({
-            title: "Account Created!",
-            description: "Welcome to SoulSync. We're glad you're here.",
+            variant: "destructive",
+            title: "Sign-up Failed",
+            description: "This email is already registered. Please sign in instead.",
         });
+        setIsLoading(false);
+        return;
+    }
 
-        // The login function handles setting the user and redirecting.
-        // We don't need to setIsLoading(false) here because the redirect will unmount the component.
-        login(newUser.email);
-        
-    }, 1000);
+    const newUser: User = {
+        id: `user-${Date.now()}`,
+        name: values.name,
+        email: values.email,
+        avatarUrl: `https://picsum.photos/seed/${values.name}/100/100`,
+        role: "student",
+        streak: 0,
+        focusPoints: 0,
+        treesPlanted: 0,
+    };
+    
+    addUser(newUser);
+
+    toast({
+        title: "Account Created!",
+        description: "Welcome to SoulSync. We're glad you're here.",
+    });
+
+    // Directly call login to trigger the state update and redirect
+    login(newUser.email);
   };
 
 
@@ -299,3 +299,5 @@ export default function AuthPage() {
     </div>
   );
 }
+
+    
