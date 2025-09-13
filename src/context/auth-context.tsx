@@ -22,24 +22,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
+  const handleRedirect = (role: UserRole) => {
+    switch (role) {
+      case "management":
+      case "admin":
+        router.push('/admin');
+        break;
+      case "volunteer":
+        router.push('/volunteer');
+        break;
+      default:
+        router.push('/dashboard');
+        break;
+    }
+  }
+
   const login = (role: UserRole, email?: string, name?: string) => {
-    // In a real app, you'd get user data from your backend
     const mockUser = email ? Object.values(mockUsers).find(u => u.email === email) : null;
 
     if (mockUser) {
         setUser(mockUser);
-        if (mockUser.role === 'management') {
-          router.push('/admin');
-        } else if (mockUser.role === 'volunteer') {
-          router.push('/volunteer');
-        } else {
-          router.push('/dashboard');
-        }
+        handleRedirect(mockUser.role);
         return;
     }
     
     if (name && email) {
-      // This is a new user signing up
       const newUser: User = {
         id: `user-${Date.now()}`,
         name,
@@ -51,24 +58,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         treesPlanted: 0,
       };
       setUser(newUser);
-      if (role === 'management') {
-          router.push('/admin');
-        } else if (role === 'volunteer') {
-          router.push('/volunteer');
-        } else {
-          router.push('/dashboard');
-        }
+      handleRedirect(newUser.role);
     } else {
-      // Fallback for generic login without email (e.g. from header button)
       const fallbackUser = {...mockUsers['user-1'], role};
       setUser(fallbackUser);
-      if (fallbackUser.role === 'management') {
-        router.push('/admin');
-      } else if (fallbackUser.role === 'volunteer') {
-        router.push('/volunteer');
-      } else {
-        router.push('/dashboard');
-      }
+      handleRedirect(fallbackUser.role);
     }
   };
 
