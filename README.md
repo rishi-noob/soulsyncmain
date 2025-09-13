@@ -47,3 +47,33 @@ npm run genkit:watch
 This will start the backend services that power the AI chatbot and other generative features. The `--watch` flag ensures the service automatically restarts if you make changes to the AI flow files.
 
 Once both processes are running, you can access the application in your browser.
+
+## Sharing Your Project
+
+The best way to share your codebase with a friend or collaborator is by using Git and a code hosting platform like GitHub.
+
+### Steps to Share:
+
+1.  **Initialize a Git Repository:**
+    If your project isn't already a Git repository, open a terminal in the project's root directory and run:
+    ```bash
+    git init
+    git add .
+    git commit -m "Initial commit"
+    ```
+
+2.  **Create a Repository on GitHub:**
+    *   Go to [GitHub](https://github.com) and create a new repository. You can make it public or private.
+    *   After creating the repository, GitHub will give you a URL (e.g., `https://github.com/your-username/your-project-name.git`).
+
+3.  **Connect and Push Your Code:**
+    In your terminal, connect your local repository to the one on GitHub and push your code:
+    ```bash
+    git remote add origin https://github.com/your-username/your-project-name.git
+    git branch -M main
+    git push -u origin main
+    ```
+    (Replace the URL with the one you got from GitHub).
+
+4.  **Share the Link:**
+    You can now share the GitHub repository link with your friend. They can download the code or clone it using Git.
