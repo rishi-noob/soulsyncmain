@@ -79,7 +79,7 @@ export default function AuthPage() {
                 passwordIsValid = true;
             }
         } else if (userExists.role === 'student') {
-            passwordIsValid = true;
+            passwordIsValid = true; // For demo, any password works for registered students
         }
 
         if (passwordIsValid) {
@@ -294,3 +294,5 @@ export default function AuthPage() {
     </div>
   );
 }
+
+    
