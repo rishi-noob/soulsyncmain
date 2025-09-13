@@ -22,21 +22,28 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const USERS_STORAGE_KEY = 'soul-sync-users';
 
+// This function now intelligently merges the base mock users with any from local storage.
 const getInitialUsers = (): Record<string, User> => {
     if (typeof window === 'undefined') {
         return mockUsers;
     }
     try {
-        const storedUsers = window.localStorage.getItem(USERS_STORAGE_KEY);
-        if (storedUsers) {
-            return JSON.parse(storedUsers);
-        } else {
-            window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(mockUsers));
-            return mockUsers;
+        const storedUsersString = window.localStorage.getItem(USERS_STORAGE_KEY);
+        const storedUsers = storedUsersString ? JSON.parse(storedUsersString) : {};
+        
+        // Ensure base mockUsers are always present, and merge stored users over them.
+        // This guarantees privileged accounts are not lost.
+        const combinedUsers = { ...mockUsers, ...storedUsers };
+        
+        // If the stored data is different from the combined data, update localStorage.
+        if (JSON.stringify(combinedUsers) !== storedUsersString) {
+             window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(combinedUsers));
         }
+
+        return combinedUsers;
     } catch (error) {
-        console.error("Failed to read from localStorage", error);
-        return mockUsers;
+        console.error("Failed to read/write from localStorage", error);
+        return mockUsers; // Fallback to base mock users on error
     }
 };
 

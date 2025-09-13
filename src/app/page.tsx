@@ -67,21 +67,18 @@ export default function AuthPage() {
         
         if (!userExists) {
             loginForm.setError("email", { type: "manual", message: "No account found with this email." });
-            toast({ variant: "destructive", title: "Login Failed" });
+            toast({ variant: "destructive", title: "Login Failed", description: "No account found with this email." });
             setIsLoading(false);
             return;
         }
 
         let passwordIsValid = false;
-        // Check if the user is a privileged user
+        
         if (userExists.role === 'management' || userExists.role === 'volunteer' || userExists.role === 'admin') {
-            // Check their password against the hardcoded list
             if (privilegedPasswords[userExists.email] === values.password) {
                 passwordIsValid = true;
             }
         } else if (userExists.role === 'student') {
-            // For student accounts, any password will work for this demo once they are registered.
-            // In a real app, you would hash and compare the password.
             passwordIsValid = true;
         }
 
