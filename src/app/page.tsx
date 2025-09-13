@@ -96,6 +96,7 @@ export default function AuthPage() {
   const handleSignup = (values: z.infer<typeof signupSchema>) => {
     setIsLoading(true);
     
+    // Using a timeout to simulate a network request
     setTimeout(() => {
         const existingUser = Object.values(allUsers).find(u => u.email === values.email);
         if (existingUser) {
@@ -127,9 +128,9 @@ export default function AuthPage() {
             description: "Welcome to SoulSync. We're glad you're here.",
         });
 
-        // Log the user in, which will trigger the redirect from the context
+        // The login function handles setting the user and redirecting.
+        // We don't need to setIsLoading(false) here because the redirect will unmount the component.
         login(newUser.email);
-        setIsLoading(false);
         
     }, 1000);
   };
