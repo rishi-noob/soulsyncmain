@@ -1,3 +1,4 @@
+
 "use client";
 
 import { BrainCircuit, Eye, EyeOff } from "lucide-react";
@@ -54,21 +55,16 @@ export default function AuthPage() {
   const handleLogin = (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     
-    // Simulate network delay
     setTimeout(() => {
         const userExists = Object.values(allUsers).find(u => u.email === values.email);
         
         if (!userExists) {
             loginForm.setError("email", { type: "manual", message: "No account found with this email." });
-            toast({ variant: "destructive", title: "Login Failed", description: "No account found with this email." });
             setIsLoading(false);
             return;
         }
 
         let passwordIsValid = false;
-        
-        // This is a simplified password check for the demo.
-        // In a real app, passwords would be hashed and checked on a server.
         const privilegedPasswords: Record<string, string> = {
             "management@gmail.com": "management123",
             "management1@gmail.com": "management1234",
@@ -81,23 +77,20 @@ export default function AuthPage() {
                 passwordIsValid = true;
             }
         } else if (userExists.role === 'student') {
-            // For demo purposes, any password works for registered students once they've signed up
             passwordIsValid = true;
         }
 
         if (passwordIsValid) {
             toast({ title: "Login Successful", description: "Redirecting to your dashboard..." });
             login(userExists.email);
-            // The redirect will happen via the login function, no need to set loading to false here
         } else {
             loginForm.setError("password", { type: "manual", message: "Incorrect password." });
-            toast({ variant: "destructive", title: "Login Failed", description: "Invalid credentials." });
             setIsLoading(false);
         }
     }, 500);
   };
 
-  const handleSignup = (values: z.infer<typeof signupSchema>) => {
+  const handleSignup = async (values: z.infer<typeof signupSchema>) => {
     setIsLoading(true);
 
     const existingUser = Object.values(allUsers).find(u => u.email === values.email);
@@ -129,9 +122,8 @@ export default function AuthPage() {
         title: "Account Created!",
         description: "Welcome to SoulSync. We're glad you're here.",
     });
-
-    // Directly call login to trigger the state update and redirect.
-    // The page will unmount, so we don't need to set isLoading to false here.
+    
+    // This now correctly logs the user in and triggers the redirect via the context.
     login(newUser.email);
   };
 
@@ -164,7 +156,7 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="name@example.com" {...field} autoComplete="off" />
+                          <Input placeholder="name@example.com" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -182,7 +174,6 @@ export default function AuthPage() {
                               type={showLoginPassword ? "text" : "password"}
                               placeholder="••••••••"
                               {...field}
-                              autoComplete="off"
                             />
                             <Button
                               type="button"
@@ -299,3 +290,5 @@ export default function AuthPage() {
     </div>
   );
 }
+
+    

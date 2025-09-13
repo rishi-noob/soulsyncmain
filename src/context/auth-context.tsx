@@ -1,3 +1,4 @@
+
 "use client";
 
 import { User, mockUsers } from "@/lib/data";
@@ -11,7 +12,7 @@ interface AuthContextType {
   role: UserRole;
   isAuthenticated: boolean;
   allUsers: Record<string, User>;
-  login: (email: string) => void;
+  login: (email: string) => User | null;
   logout: () => void;
   setRole: (role: UserRole) => void;
   updateUser: (data: Partial<User>) => void;
@@ -22,7 +23,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const USERS_STORAGE_KEY = 'soul-sync-users';
 
-// This function now intelligently merges the base mock users with any from local storage.
 const getInitialUsers = (): Record<string, User> => {
     if (typeof window === 'undefined') {
         return mockUsers;
@@ -31,11 +31,8 @@ const getInitialUsers = (): Record<string, User> => {
         const storedUsersString = window.localStorage.getItem(USERS_STORAGE_KEY);
         const storedUsers = storedUsersString ? JSON.parse(storedUsersString) : {};
         
-        // Ensure base mockUsers are always present, and merge stored users over them.
-        // This guarantees privileged accounts are not lost.
         const combinedUsers = { ...mockUsers, ...storedUsers };
         
-        // If the stored data is different from the combined data, update localStorage.
         if (JSON.stringify(combinedUsers) !== storedUsersString) {
              window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(combinedUsers));
         }
@@ -43,7 +40,7 @@ const getInitialUsers = (): Record<string, User> => {
         return combinedUsers;
     } catch (error) {
         console.error("Failed to read/write from localStorage", error);
-        return mockUsers; // Fallback to base mock users on error
+        return mockUsers;
     }
 };
 
@@ -86,7 +83,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (userToLogin) {
         setUser(userToLogin);
         handleRedirect(userToLogin.role);
+        return userToLogin;
     }
+    return null;
   };
 
   const logout = () => {
@@ -127,3 +126,5 @@ export function useAuth() {
   }
   return context;
 }
+
+    
