@@ -9,6 +9,7 @@ export type User = {
   streak: number;
   focusPoints: number;
   treesPlanted: number;
+  password?: string;
 };
 
 export type Thread = {
@@ -78,6 +79,7 @@ export const mockUsers: Record<string, User> = {
     avatarUrl: "https://picsum.photos/seed/management1/100/100",
     role: "management",
     streak: 0, focusPoints: 0, treesPlanted: 0,
+    password: "management123",
   },
   "management-2": {
     id: "management-2",
@@ -86,6 +88,7 @@ export const mockUsers: Record<string, User> = {
     avatarUrl: "https://picsum.photos/seed/management2/100/100",
     role: "management",
     streak: 0, focusPoints: 0, treesPlanted: 0,
+    password: "management1234",
   },
   "volunteer-1": {
     id: "volunteer-1",
@@ -94,6 +97,7 @@ export const mockUsers: Record<string, User> = {
     avatarUrl: "https://picsum.photos/seed/volunteer1/100/100",
     role: "volunteer",
     streak: 0, focusPoints: 0, treesPlanted: 0,
+    password: "volunteer1",
   },
   "volunteer-2": {
     id: "volunteer-2",
@@ -102,6 +106,7 @@ export const mockUsers: Record<string, User> = {
     avatarUrl: "https://picsum.photos/seed/volunteer2/100/100",
     role: "volunteer",
     streak: 0, focusPoints: 0, treesPlanted: 0,
+    password: "volunteer1",
   },
 };
 
