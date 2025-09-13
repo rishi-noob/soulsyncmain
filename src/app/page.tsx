@@ -105,14 +105,16 @@ export default function AuthPage() {
         // Add new user to our context, which saves it to localStorage
         addUser(newUser);
         
-        // Log the user in
+        // Log the user in automatically
         login(newUser.email);
-        setIsLoading(false);
         
         toast({
             title: "Account Created!",
             description: "Welcome to SoulSync. We're glad you're here.",
         });
+
+        // The loading state will be handled by the redirect
+        // setIsLoading(false);
 
     }, 1000);
   };
