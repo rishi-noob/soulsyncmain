@@ -17,13 +17,8 @@ export function Header() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   // Define the base navigation items shared by all roles
-  const baseNavItems = [
-    { href: "/mood-tracker", label: "Mood Tracker" },
-    { href: "/calendar", label: "Calendar" },
-    { href: "/journal", label: "Journal" },
-    { href: "/forum", label: "Peer Forum" },
-    { href: "/focus-tool", label: "Focus" },
-    { href: "/resources", label: "Resources" },
+  const studentNavItems = [
+    { href: "/dashboard", label: "Student Dashboard" },
   ];
   
   // The primary navigation link now points to a role-based router page.
@@ -39,7 +34,18 @@ export function Header() {
         ]
       : [];
 
-  const navItems = [primaryNavItem, ...managementNavItems, ...baseNavItems];
+  const navItems = (role === 'admin' || role === 'management') 
+    ? [primaryNavItem, ...managementNavItems, ...studentNavItems]
+    : [
+        primaryNavItem,
+        { href: "/mood-tracker", label: "Mood Tracker" },
+        { href: "/calendar", label: "Calendar" },
+        { href: "/journal", label: "Journal" },
+        { href: "/forum", label: "Peer Forum" },
+        { href: "/focus-tool", label: "Focus" },
+        { href: "/resources", label: "Resources" },
+      ];
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
