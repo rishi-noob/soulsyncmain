@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { UserRole } from "@/context/auth-context";
+import { UserRole, User } from "@/context/auth-context";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { mockUsers } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
@@ -38,6 +38,9 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
+  
+  // Simulate a user database that can be updated
+  const [users, setUsers] = useState<Record<string, User>>(mockUsers);
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -51,16 +54,16 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/dashboard");
+      router.push("/home");
     }
   }, [isAuthenticated, router]);
 
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     // In a real app, you would verify credentials against a database.
-    console.log("Logging in with:", values);
     setTimeout(() => {
-        const user = Object.values(mockUsers).find(u => u.email === values.email);
+        // Check against the stateful 'users' list
+        const user = Object.values(users).find(u => u.email === values.email);
         
         // This is a simplified mock login. In a real app, you'd check hashed passwords.
         if (user) {
@@ -79,11 +82,9 @@ export default function AuthPage() {
 
   const handleSignup = async (values: z.infer<typeof signupSchema>) => {
     setIsLoading(true);
-    // In a real app, you would create a new user in your database.
-    console.log("Signing up with:", values);
-
-    // Check if user already exists
-    const existingUser = Object.values(mockUsers).find(u => u.email === values.email);
+    
+    // Check if user already exists in our stateful list
+    const existingUser = Object.values(users).find(u => u.email === values.email);
     if (existingUser) {
         signupForm.setError("email", { type: "manual", message: "An account with this email already exists." });
         toast({
@@ -96,7 +97,25 @@ export default function AuthPage() {
     }
 
     setTimeout(() => {
-        login(values.role as UserRole, values.email, values.name);
+        const newUser: User = {
+            id: `user-${Date.now()}`,
+            name: values.name,
+            email: values.email,
+            avatarUrl: `https://picsum.photos/seed/${values.name}/100/100`,
+            role: values.role as UserRole,
+            streak: 0,
+            focusPoints: 0,
+            treesPlanted: 0,
+        };
+
+        // Add new user to our simulated database
+        setUsers(prevUsers => ({
+            ...prevUsers,
+            [newUser.id]: newUser,
+        }));
+        
+        // Log the user in
+        login(newUser.role, newUser.email, newUser.name);
         setIsLoading(false);
     }, 1000);
   };
