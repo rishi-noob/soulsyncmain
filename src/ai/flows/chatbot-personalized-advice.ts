@@ -65,8 +65,26 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
     inputSchema: GeneratePersonalizedAdviceInputSchema,
     outputSchema: GeneratePersonalizedAdviceOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  async (input, streamingCallback) => {
+    let retries = 0;
+    const maxRetries = 3;
+
+    while (retries < maxRetries) {
+      try {
+        const {output} = await prompt(input);
+        return output!;
+      } catch (error: any) {
+        if (error.message.includes('503 Service Unavailable') && retries < maxRetries - 1) {
+          retries++;
+          // Wait for a short period before retrying (e.g., 1 second, with exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 1000 * retries));
+        } else {
+          // If it's not a 503 error or retries are exhausted, throw the error
+          throw error;
+        }
+      }
+    }
+    // This should not be reached if the loop is correct, but as a fallback:
+    throw new Error('Failed to generate advice after multiple retries.');
   }
 );
