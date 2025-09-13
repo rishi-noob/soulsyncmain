@@ -15,7 +15,6 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UserRole, User } from "@/context/auth-context";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { mockUsers } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
@@ -32,16 +31,13 @@ const signupSchema = z.object({
 
 
 export default function AuthPage() {
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, allUsers, addUser } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
   
-  // Simulate a user database that can be updated
-  const [users, setUsers] = useState<Record<string, User>>(mockUsers);
-
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
@@ -62,8 +58,7 @@ export default function AuthPage() {
     setIsLoading(true);
     // In a real app, you would verify credentials against a database.
     setTimeout(() => {
-        // Check against the stateful 'users' list
-        const user = Object.values(users).find(u => u.email === values.email);
+        const user = Object.values(allUsers).find(u => u.email === values.email);
         
         // This is a simplified mock login. In a real app, you'd check hashed passwords.
         if (user) {
@@ -83,8 +78,8 @@ export default function AuthPage() {
   const handleSignup = async (values: z.infer<typeof signupSchema>) => {
     setIsLoading(true);
     
-    // Check if user already exists in our stateful list
-    const existingUser = Object.values(users).find(u => u.email === values.email);
+    // Check if user already exists
+    const existingUser = Object.values(allUsers).find(u => u.email === values.email);
     if (existingUser) {
         signupForm.setError("email", { type: "manual", message: "An account with this email already exists." });
         toast({
@@ -107,12 +102,9 @@ export default function AuthPage() {
             focusPoints: 0,
             treesPlanted: 0,
         };
-
-        // Add new user to our simulated database
-        setUsers(prevUsers => ({
-            ...prevUsers,
-            [newUser.id]: newUser,
-        }));
+        
+        // Add new user to our context
+        addUser(newUser);
         
         // Log the user in
         login(newUser.role, newUser.email, newUser.name);
