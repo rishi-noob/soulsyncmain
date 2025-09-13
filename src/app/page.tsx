@@ -121,12 +121,15 @@ export default function AuthPage() {
         };
         
         addUser(newUser);
-        login(newUser.email);
-        
+
         toast({
             title: "Account Created!",
             description: "Welcome to SoulSync. We're glad you're here.",
         });
+
+        // Log the user in, which will trigger the redirect from the context
+        login(newUser.email);
+        
     }, 1000);
   };
 
@@ -294,5 +297,3 @@ export default function AuthPage() {
     </div>
   );
 }
-
-    
