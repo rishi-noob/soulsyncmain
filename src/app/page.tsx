@@ -27,15 +27,6 @@ const signupSchema = z.object({
     password: z.string().min(8, { message: "Password must be at least 8 characters." }),
 });
 
-// These are the hardcoded credentials for privileged accounts.
-// This is for demonstration purposes only. In a real app, passwords would be hashed.
-const privilegedPasswords: Record<string, string> = {
-    "management@gmail.com": "management123",
-    "management1@gmail.com": "management1234",
-    "volunteer@gmail.com": "volunteer1",
-    "volunteer1@gmail.com": "volunteer1"
-};
-
 export default function AuthPage() {
   const { login, isAuthenticated, allUsers, addUser } = useAuth();
   const router = useRouter();
@@ -76,13 +67,21 @@ export default function AuthPage() {
 
         let passwordIsValid = false;
         
-        // For privileged roles, check against the hardcoded password list
+        // This is a simplified password check for the demo.
+        // In a real app, passwords would be hashed and checked on a server.
+        const privilegedPasswords: Record<string, string> = {
+            "management@gmail.com": "management123",
+            "management1@gmail.com": "management1234",
+            "volunteer@gmail.com": "volunteer1",
+            "volunteer1@gmail.com": "volunteer1"
+        };
+        
         if (userExists.role === 'management' || userExists.role === 'volunteer' || userExists.role === 'admin') {
             if (privilegedPasswords[userExists.email] === values.password) {
                 passwordIsValid = true;
             }
         } else if (userExists.role === 'student') {
-            // For demo purposes, any password works for registered students
+            // For demo purposes, any password works for registered students once they've signed up
             passwordIsValid = true;
         }
 
@@ -95,7 +94,7 @@ export default function AuthPage() {
             toast({ variant: "destructive", title: "Login Failed", description: "Invalid credentials." });
             setIsLoading(false);
         }
-    }, 1000);
+    }, 500);
   };
 
   const handleSignup = (values: z.infer<typeof signupSchema>) => {
@@ -131,7 +130,8 @@ export default function AuthPage() {
         description: "Welcome to SoulSync. We're glad you're here.",
     });
 
-    // Directly call login to trigger the state update and redirect
+    // Directly call login to trigger the state update and redirect.
+    // The page will unmount, so we don't need to set isLoading to false here.
     login(newUser.email);
   };
 
@@ -299,5 +299,3 @@ export default function AuthPage() {
     </div>
   );
 }
-
-    
