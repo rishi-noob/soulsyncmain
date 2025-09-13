@@ -61,26 +61,6 @@ export const mockUsers: Record<string, User> = {
     focusPoints: 0,
     treesPlanted: 0,
   },
-  "user-2": {
-    id: "user-2",
-    name: "Sam Smith",
-    email: "sam.smith@example.com",
-    avatarUrl: "https://picsum.photos/seed/avatar2/100/100",
-    role: "volunteer",
-    streak: 0,
-    focusPoints: 0,
-    treesPlanted: 0,
-  },
-  "user-3": {
-    id: "user-3",
-    name: "Casey Jones",
-    email: "casey.jones@example.com",
-    avatarUrl: "https://picsum.photos/seed/avatar3/100/100",
-    role: "admin",
-    streak: 0,
-    focusPoints: 0,
-    treesPlanted: 0,
-  },
   "user-rishabh": {
     id: "user-rishabh",
     name: "Rishabh Sharma",
@@ -90,7 +70,39 @@ export const mockUsers: Record<string, User> = {
     streak: 15,
     focusPoints: 256,
     treesPlanted: 8,
-  }
+  },
+  "management-1": {
+    id: "management-1",
+    name: "Management User",
+    email: "management@gmail.com",
+    avatarUrl: "https://picsum.photos/seed/management1/100/100",
+    role: "management",
+    streak: 0, focusPoints: 0, treesPlanted: 0,
+  },
+  "management-2": {
+    id: "management-2",
+    name: "Management User 2",
+    email: "management1@gmail.com",
+    avatarUrl: "https://picsum.photos/seed/management2/100/100",
+    role: "management",
+    streak: 0, focusPoints: 0, treesPlanted: 0,
+  },
+  "volunteer-1": {
+    id: "volunteer-1",
+    name: "Volunteer User",
+    email: "volunteer@gmail.com",
+    avatarUrl: "https://picsum.photos/seed/volunteer1/100/100",
+    role: "volunteer",
+    streak: 0, focusPoints: 0, treesPlanted: 0,
+  },
+  "volunteer-2": {
+    id: "volunteer-2",
+    name: "Volunteer User 2",
+    email: "volunteer1@gmail.com",
+    avatarUrl: "https://picsum.photos/seed/volunteer2/100/100",
+    role: "volunteer",
+    streak: 0, focusPoints: 0, treesPlanted: 0,
+  },
 };
 
 export const mockThreads: Thread[] = [
@@ -102,7 +114,7 @@ export const mockThreads: Thread[] = [
 
 export const mockMessages: Message[] = [
   { id: 'msg-1', threadId: 'thread-1', authorHash: "Student_1a2b", authorAvatar: mockUsers['user-1'].avatarUrl, authorRole: 'student', text: "I have 3 exams next week and I'm feeling so overwhelmed. Any tips on how to manage the stress?", createdAt: "2 days ago" },
-  { id: 'msg-2', threadId: 'thread-1', authorHash: "Volunteer_9i0j", authorAvatar: mockUsers['user-2'].avatarUrl, authorRole: 'volunteer', text: "Hey! It's completely normal to feel that way. Make sure you're taking short breaks. The Pomodoro technique can be really helpful. There's a great tool for it in this app!", createdAt: "2 days ago" },
+  { id: 'msg-2', threadId: 'thread-1', authorHash: "Volunteer_9i0j", authorAvatar: "https://picsum.photos/seed/volunteer1/100/100", authorRole: 'volunteer', text: "Hey! It's completely normal to feel that way. Make sure you're taking short breaks. The Pomodoro technique can be really helpful. There's a great tool for it in this app!", createdAt: "2 days ago" },
   { id: 'msg-3', threadId: 'thread-1', authorHash: "Student_3c4d", authorAvatar: "https://picsum.photos/seed/avatar4/100/100", authorRole: 'student', text: "I find that breaking down my study material into smaller chunks makes it less daunting. And lots of tea!", createdAt: "1 day ago" },
 ];
 

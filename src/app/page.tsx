@@ -14,7 +14,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UserRole, User } from "@/context/auth-context";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
@@ -26,7 +25,6 @@ const signupSchema = z.object({
     name: z.string().min(2, { message: "Name must be at least 2 characters." }),
     email: z.string().email({ message: "Invalid email address." }),
     password: z.string().min(8, { message: "Password must be at least 8 characters." }),
-    role: z.enum(["student", "volunteer", "management"]),
 });
 
 
@@ -45,7 +43,7 @@ export default function AuthPage() {
 
   const signupForm = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { name: "", email: "", password: "", role: "student" },
+    defaultValues: { name: "", email: "", password: "" },
   });
 
   useEffect(() => {
@@ -96,7 +94,7 @@ export default function AuthPage() {
             name: values.name,
             email: values.email,
             avatarUrl: `https://picsum.photos/seed/${values.name}/100/100`,
-            role: values.role as UserRole,
+            role: "student", // All signups are students by default
             streak: 0,
             focusPoints: 0,
             treesPlanted: 0,
@@ -148,7 +146,7 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="name@example.com" {...field} />
+                          <Input placeholder="name@example.com" {...field} autoComplete="off" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -166,6 +164,7 @@ export default function AuthPage() {
                               type={showLoginPassword ? "text" : "password"}
                               placeholder="••••••••"
                               {...field}
+                              autoComplete="new-password"
                             />
                             <Button
                               type="button"
@@ -203,7 +202,7 @@ export default function AuthPage() {
                  <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
                     <BrainCircuit className="h-10 w-10 text-primary" />
                 </div>
-              <CardTitle className="text-3xl font-bold font-headline tracking-tight">Create an Account</CardTitle>
+              <CardTitle className="text-3xl font-bold font-headline tracking-tight">Create a Student Account</CardTitle>
               <CardDescription>Join SoulSync to take control of your well-being.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -266,28 +265,6 @@ export default function AuthPage() {
                             </Button>
                           </div>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                   <FormField
-                    control={signupForm.control}
-                    name="role"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>I am a...</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select your role" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="student">Student</SelectItem>
-                            <SelectItem value="volunteer">Volunteer</SelectItem>
-                            <SelectItem value="management">Management</SelectItem>
-                          </SelectContent>
-                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
