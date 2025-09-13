@@ -1,17 +1,36 @@
+
 "use client";
 
 import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FilePlus, Flag, MessageSquare, Newspaper } from "lucide-react";
+import { FilePlus, Flag, MessageSquare } from "lucide-react";
 import Link from "next/link";
+import { BarChart, LineChart, XAxis, YAxis, Tooltip, Legend, Line, Bar, CartesianGrid } from 'recharts';
+import { mockAdminStats } from '@/lib/data';
+import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+
+const moodChartConfig = {
+  mood: {
+    label: 'Avg. Mood (1-5)',
+    color: 'hsl(var(--chart-1))',
+  },
+} satisfies ChartConfig;
+
+const forumChartConfig = {
+    posts: {
+        label: 'Forum Posts',
+        color: 'hsl(var(--chart-2))',
+    }
+} satisfies ChartConfig;
+
 
 export default function VolunteerPage() {
     const { user, role } = useAuth();
     const router = useRouter();
 
-    if (role !== "volunteer") {
+    if (role !== "volunteer" && role !== "admin" && role !== "management") {
         router.push('/dashboard');
         return (
             <div className="container mx-auto p-8 text-center">
@@ -82,7 +101,7 @@ export default function VolunteerPage() {
                             </Link>
                         </Button>
                          <Button asChild size="lg" variant="outline">
-                            <Link href="#">
+                            <Link href="/admin/moderation">
                                 <Flag className="mr-2"/>
                                 Review Flagged Content
                             </Link>
@@ -101,8 +120,33 @@ export default function VolunteerPage() {
                         <CardTitle>Student Engagement Analytics</CardTitle>
                         <CardDescription>Anonymized trends in community wellness.</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">Charts and summaries about student engagement and mood trends would be displayed here for volunteers to see community-level insights without compromising individual privacy.</p>
+                    <CardContent className="grid lg:grid-cols-2 gap-8">
+                         <div className="flex flex-col gap-4">
+                            <h3 className="font-semibold">Monthly Mood Trends</h3>
+                            <ChartContainer config={moodChartConfig} className="h-[250px] w-full">
+                                <LineChart data={mockAdminStats.moodTrends}>
+                                    <CartesianGrid vertical={false} />
+                                    <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
+                                    <YAxis domain={[1, 5]} />
+                                    <Tooltip content={<ChartTooltipContent />} />
+                                    <Legend />
+                                    <Line type="monotone" dataKey="mood" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={false} />
+                                </LineChart>
+                            </ChartContainer>
+                        </div>
+                         <div className="flex flex-col gap-4">
+                            <h3 className="font-semibold">Forum Activity</h3>
+                            <ChartContainer config={forumChartConfig} className="h-[250px] w-full">
+                                <BarChart data={mockAdminStats.forumActivity}>
+                                    <CartesianGrid vertical={false} />
+                                    <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
+                                    <YAxis />
+                                    <Tooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                                    <Legend />
+                                    <Bar dataKey="posts" fill="hsl(var(--chart-2))" radius={4} />
+                                </BarChart>
+                            </ChartContainer>
+                        </div>
                     </CardContent>
                 </Card>
 
