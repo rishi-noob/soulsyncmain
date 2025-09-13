@@ -54,15 +54,15 @@ export default function AuthPage() {
     }
   }, [isAuthenticated, router]);
 
-  const handleLogin = async (values: z.infer<typeof loginSchema>) => {
+  const handleLogin = (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     // In a real app, you would verify credentials against a database.
+    // This is a simplified mock login. In a real app, you'd check hashed passwords.
     setTimeout(() => {
-        const user = Object.values(allUsers).find(u => u.email === values.email);
+        const userExists = Object.values(allUsers).find(u => u.email === values.email);
         
-        // This is a simplified mock login. In a real app, you'd check hashed passwords.
-        if (user) {
-            login(user.role, user.email, user.name);
+        if (userExists) {
+            login(values.email);
         } else {
             loginForm.setError("email", { type: "manual", message: "No account found with this email." });
             toast({
@@ -75,7 +75,7 @@ export default function AuthPage() {
     }, 1000);
   };
 
-  const handleSignup = async (values: z.infer<typeof signupSchema>) => {
+  const handleSignup = (values: z.infer<typeof signupSchema>) => {
     setIsLoading(true);
     
     // Check if user already exists
@@ -107,7 +107,7 @@ export default function AuthPage() {
         addUser(newUser);
         
         // Log the user in
-        login(newUser.role, newUser.email, newUser.name);
+        login(newUser.email);
         setIsLoading(false);
     }, 1000);
   };

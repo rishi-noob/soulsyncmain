@@ -1,7 +1,7 @@
 "use client";
 
 import { User, mockUsers } from "@/lib/data";
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export type UserRole = "student" | "volunteer" | "admin" | "counsellor" | "management";
@@ -11,7 +11,7 @@ interface AuthContextType {
   role: UserRole;
   isAuthenticated: boolean;
   allUsers: Record<string, User>;
-  login: (role: UserRole, email?: string, name?: string) => void;
+  login: (email: string) => void;
   logout: () => void;
   setRole: (role: UserRole) => void;
   updateUser: (data: Partial<User>) => void;
@@ -20,10 +20,39 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const USERS_STORAGE_KEY = 'soul-sync-users';
+
+const getInitialUsers = (): Record<string, User> => {
+    if (typeof window === 'undefined') {
+        return mockUsers;
+    }
+    try {
+        const storedUsers = window.localStorage.getItem(USERS_STORAGE_KEY);
+        if (storedUsers) {
+            return JSON.parse(storedUsers);
+        } else {
+            window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(mockUsers));
+            return mockUsers;
+        }
+    } catch (error) {
+        console.error("Failed to read from localStorage", error);
+        return mockUsers;
+    }
+};
+
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [allUsers, setAllUsers] = useState<Record<string, User>>(mockUsers);
+  const [allUsers, setAllUsers] = useState<Record<string, User>>(getInitialUsers);
   const router = useRouter();
+
+  useEffect(() => {
+    try {
+        window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(allUsers));
+    } catch (error) {
+        console.error("Failed to write to localStorage", error);
+    }
+  }, [allUsers]);
 
   const handleRedirect = (role: UserRole) => {
     switch (role) {
@@ -44,35 +73,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAllUsers(prev => ({ ...prev, [newUser.id]: newUser }));
   };
 
-  const login = (role: UserRole, email?: string, name?: string) => {
-    const mockUser = email ? Object.values(allUsers).find(u => u.email === email) : null;
+  const login = (email: string) => {
+    const userToLogin = Object.values(allUsers).find(u => u.email === email);
 
-    if (mockUser) {
-        setUser(mockUser);
-        handleRedirect(mockUser.role);
-        return;
-    }
-    
-    // Fallback for new signups or if email doesn't match for some reason
-    if (name && email) {
-      const newUser: User = {
-        id: `user-${Date.now()}`,
-        name,
-        email,
-        avatarUrl: `https://picsum.photos/seed/${name}/100/100`,
-        role,
-        streak: 0,
-        focusPoints: 0,
-        treesPlanted: 0,
-      };
-      setUser(newUser);
-      addUser(newUser);
-      handleRedirect(newUser.role);
-    } else {
-      // Fallback if no user is found, logs in a default student
-      const fallbackUser = {...mockUsers['user-1'], role: 'student'};
-      setUser(fallbackUser);
-      handleRedirect(fallbackUser.role);
+    if (userToLogin) {
+        setUser(userToLogin);
+        handleRedirect(userToLogin.role);
     }
   };
 
@@ -83,13 +89,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   
   const setRole = (role: UserRole) => {
     if (user) {
-      setUser({ ...user, role });
+        const updatedUser = { ...user, role };
+        setUser(updatedUser);
+        setAllUsers(prev => ({...prev, [user.id]: updatedUser}));
     }
   };
 
   const updateUser = (data: Partial<User>) => {
     if (user) {
-        setUser({ ...user, ...data });
+        const updatedUser = { ...user, ...data };
+        setUser(updatedUser);
+        setAllUsers(prev => ({...prev, [user.id]: updatedUser}));
     }
   };
 
