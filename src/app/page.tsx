@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { UserRole, User } from "@/context/auth-context";
+import { User, UserRole } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
@@ -82,7 +82,7 @@ export default function AuthPage() {
 
         if (isPrivileged) {
             passwordIsValid = privilegedPasswords[values.email] === values.password;
-        } else {
+        } else if (userExists.role === 'student') {
             // For student accounts, we are not storing passwords in this mock.
             // In a real app, you would hash and check the password.
             // For this demo, any password will work for student accounts once registered.
@@ -195,7 +195,7 @@ export default function AuthPage() {
                               type={showLoginPassword ? "text" : "password"}
                               placeholder="••••••••"
                               {...field}
-                              autoComplete="new-password"
+                              autoComplete="off"
                             />
                             <Button
                               type="button"
@@ -312,3 +312,5 @@ export default function AuthPage() {
     </div>
   );
 }
+
+    
