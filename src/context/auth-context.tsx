@@ -12,7 +12,7 @@ interface AuthContextType {
   role: UserRole;
   isAuthenticated: boolean;
   allUsers: Record<string, User>;
-  login: (email: string) => User | null;
+  login: (email: string, password?: string) => User | null;
   logout: () => void;
   setRole: (role: UserRole) => void;
   updateUser: (data: Partial<User>) => void;
@@ -23,20 +23,28 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const USERS_STORAGE_KEY = 'soul-sync-users';
 
+// This function now correctly merges the base mockUsers with users from localStorage
 const getInitialUsers = (): Record<string, User> => {
     if (typeof window === 'undefined') {
         return mockUsers;
     }
     try {
         const storedUsersString = window.localStorage.getItem(USERS_STORAGE_KEY);
-        const storedUsers = storedUsersString ? JSON.parse(storedUsersString) : {};
-        
-        const combinedUsers = { ...mockUsers, ...storedUsers };
-        
-        if (JSON.stringify(combinedUsers) !== storedUsersString) {
-             window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(combinedUsers));
-        }
+        // Start with the base mock users to ensure privileged accounts are always present
+        let combinedUsers = { ...mockUsers };
 
+        if (storedUsersString) {
+            const storedUsers = JSON.parse(storedUsersString);
+            // Merge stored users, giving precedence to stored data for non-privileged accounts
+            for (const userId in storedUsers) {
+                if (!mockUsers[userId] || mockUsers[userId].role === 'student') {
+                    combinedUsers[userId] = storedUsers[userId];
+                }
+            }
+        }
+        
+        // Persist the potentially merged list back to localStorage
+        window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(combinedUsers));
         return combinedUsers;
     } catch (error) {
         console.error("Failed to read/write from localStorage", error);
@@ -77,14 +85,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAllUsers(prev => ({ ...prev, [newUser.id]: newUser }));
   };
 
-  const login = (email: string) => {
+  const login = (email: string, password?: string) => {
     const userToLogin = Object.values(allUsers).find(u => u.email === email);
 
-    if (userToLogin) {
+    if (!userToLogin) {
+        return null;
+    }
+
+    // For student roles, no password check is needed for this demo app
+    if (userToLogin.role === 'student') {
         setUser(userToLogin);
         handleRedirect(userToLogin.role);
         return userToLogin;
     }
+
+    // For privileged roles, we must check the password
+    if (userToLogin.password === password) {
+        setUser(userToLogin);
+        handleRedirect(userToLogin.role);
+        return userToLogin;
+    }
+
     return null;
   };
 
@@ -126,5 +147,3 @@ export function useAuth() {
   }
   return context;
 }
-
-    

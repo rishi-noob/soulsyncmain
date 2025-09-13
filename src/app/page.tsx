@@ -35,6 +35,7 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState("login");
   
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -55,82 +56,59 @@ export default function AuthPage() {
   const handleLogin = (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     
+    // This timeout simulates a network request
     setTimeout(() => {
-        const userExists = Object.values(allUsers).find(u => u.email === values.email);
-        
-        if (!userExists) {
-            loginForm.setError("email", { type: "manual", message: "No account found with this email." });
-            setIsLoading(false);
-            return;
-        }
+        const loggedInUser = login(values.email, values.password);
 
-        let passwordIsValid = false;
-        const privilegedPasswords: Record<string, string> = {
-            "management@gmail.com": "management123",
-            "management1@gmail.com": "management1234",
-            "volunteer@gmail.com": "volunteer1",
-            "volunteer1@gmail.com": "volunteer1"
-        };
-        
-        if (userExists.role === 'management' || userExists.role === 'volunteer' || userExists.role === 'admin') {
-            if (privilegedPasswords[userExists.email] === values.password) {
-                passwordIsValid = true;
-            }
-        } else if (userExists.role === 'student') {
-            passwordIsValid = true;
-        }
-
-        if (passwordIsValid) {
+        if (loggedInUser) {
             toast({ title: "Login Successful", description: "Redirecting to your dashboard..." });
-            login(userExists.email);
+            // The context handles the redirect, so no router.push here
         } else {
-            loginForm.setError("password", { type: "manual", message: "Incorrect password." });
+            loginForm.setError("root", { type: "manual", message: "Invalid email or password." });
             setIsLoading(false);
         }
     }, 500);
   };
 
-  const handleSignup = async (values: z.infer<typeof signupSchema>) => {
+  const handleSignup = (values: z.infer<typeof signupSchema>) => {
     setIsLoading(true);
 
-    const existingUser = Object.values(allUsers).find(u => u.email === values.email);
-    if (existingUser) {
-        signupForm.setError("email", { type: "manual", message: "An account with this email already exists." });
+    setTimeout(() => {
+        const existingUser = Object.values(allUsers).find(u => u.email === values.email);
+        if (existingUser) {
+            signupForm.setError("email", { type: "manual", message: "An account with this email already exists." });
+            setIsLoading(false);
+            return;
+        }
+
+        const newUser: User = {
+            id: `user-${Date.now()}`,
+            name: values.name,
+            email: values.email,
+            avatarUrl: `https://picsum.photos/seed/${values.name}/100/100`,
+            role: "student",
+            streak: 0,
+            focusPoints: 0,
+            treesPlanted: 0,
+        };
+        
+        addUser(newUser);
+
         toast({
-            variant: "destructive",
-            title: "Sign-up Failed",
-            description: "This email is already registered. Please sign in instead.",
+            title: "Account Created!",
+            description: "Sign in now.",
         });
+        
+        signupForm.reset();
+        setActiveTab("login");
         setIsLoading(false);
-        return;
-    }
-
-    const newUser: User = {
-        id: `user-${Date.now()}`,
-        name: values.name,
-        email: values.email,
-        avatarUrl: `https://picsum.photos/seed/${values.name}/100/100`,
-        role: "student",
-        streak: 0,
-        focusPoints: 0,
-        treesPlanted: 0,
-    };
-    
-    addUser(newUser);
-
-    toast({
-        title: "Account Created!",
-        description: "Welcome to SoulSync. We're glad you're here.",
-    });
-    
-    // This now correctly logs the user in and triggers the redirect via the context.
-    login(newUser.email);
+    }, 500);
   };
 
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-purple-900/10 p-4">
-      <Tabs defaultValue="login" className="w-full max-w-md">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-md">
         <div className="flex justify-center mb-4">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Sign In</TabsTrigger>
@@ -149,6 +127,9 @@ export default function AuthPage() {
             <CardContent>
               <Form {...loginForm}>
                 <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                  {loginForm.formState.errors.root && (
+                    <p className="text-sm font-medium text-destructive">{loginForm.formState.errors.root.message}</p>
+                  )}
                   <FormField
                     control={loginForm.control}
                     name="email"
@@ -279,7 +260,7 @@ export default function AuthPage() {
                     )}
                   />
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Creating Account..." : "Create Account"}
+                    Create Account
                   </Button>
                 </form>
               </Form>
@@ -290,5 +271,3 @@ export default function AuthPage() {
     </div>
   );
 }
-
-    
