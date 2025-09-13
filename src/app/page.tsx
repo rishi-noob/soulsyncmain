@@ -129,6 +129,7 @@ export default function AuthPage() {
 
         // Log the user in, which will trigger the redirect from the context
         login(newUser.email);
+        setIsLoading(false);
         
     }, 1000);
   };
