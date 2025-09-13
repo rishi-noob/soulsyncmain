@@ -27,6 +27,13 @@ const signupSchema = z.object({
     password: z.string().min(8, { message: "Password must be at least 8 characters." }),
 });
 
+// Hardcoded passwords for privileged accounts for this mock setup
+const privilegedPasswords: Record<string, string> = {
+    "management@gmail.com": "management123",
+    "management1@gmail.com": "management1234",
+    "volunteer@gmail.com": "volunteer1",
+    "volunteer1@gmail.com": "volunteer1"
+};
 
 export default function AuthPage() {
   const { login, isAuthenticated, allUsers, addUser } = useAuth();
@@ -58,10 +65,34 @@ export default function AuthPage() {
     setTimeout(() => {
         const userExists = Object.values(allUsers).find(u => u.email === values.email);
         
-        if (userExists) {
+        if (!userExists) {
+            loginForm.setError("email", { type: "manual", message: "No account found with this email." });
+            toast({
+                variant: "destructive",
+                title: "Login Failed",
+                description: "Invalid credentials. Please try again.",
+            });
+            setIsLoading(false);
+            return;
+        }
+
+        // Check password
+        const isPrivileged = Object.keys(privilegedPasswords).includes(values.email);
+        let passwordIsValid = false;
+
+        if (isPrivileged) {
+            passwordIsValid = privilegedPasswords[values.email] === values.password;
+        } else {
+            // For student accounts, we are not storing passwords in this mock.
+            // In a real app, you would hash and check the password.
+            // For this demo, any password will work for student accounts once registered.
+            passwordIsValid = true; 
+        }
+
+        if (passwordIsValid) {
             login(values.email);
         } else {
-            loginForm.setError("email", { type: "manual", message: "No account found with this email." });
+             loginForm.setError("password", { type: "manual", message: "Incorrect password." });
             toast({
                 variant: "destructive",
                 title: "Login Failed",
