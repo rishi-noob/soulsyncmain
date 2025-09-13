@@ -44,3 +44,19 @@ Create a high-level flowchart for the SoulSync web application. The diagram shou
     1.  User adds an academic event (e.g., exam, assignment) to the calendar.
     2.  User clicks "Generate Reminders."
     3.  The system sends upcoming events to the **Gemini AI Model**, which generates personalized wellness tips related to the academic schedule.
+
+*   **Feature: Private Journal**
+    1.  User writes their thoughts in an editor, optionally using a template.
+    2.  User clicks "Save Entry".
+    3.  The system saves the entry and adds it to the "Past Entries" list.
+
+*   **Feature: Resource Center**
+    1.  User navigates to the Resources page to view articles and videos.
+    2.  **Decision:** Is the user an Admin or Volunteer?
+        *   **Yes:** User has access to "Add", "Edit", and "Delete" buttons for resources. The system updates the list upon changes.
+        *   **No:** User has read-only access.
+
+*   **Feature: Book a Session**
+    1.  User navigates to the Booking page.
+    2.  User clicks the "Schedule Your Appointment" button.
+    3.  The system redirects the user to an external booking link (Google Form).
