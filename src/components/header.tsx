@@ -16,35 +16,27 @@ export function Header() {
   const { isAuthenticated, user, role } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  // Define the base navigation items shared by all roles
-  const studentNavItems = [
-    { href: "/dashboard", label: "Student Dashboard" },
-  ];
-  
-  // The primary navigation link now points to a role-based router page.
   const primaryNavItem = { href: "/home", label: "Home" };
 
-  // For admin/management, add specific analytics/management links
-  const managementNavItems =
-    role === "admin" || role === "management"
-      ? [
-          { href: "/admin", label: "Analytics" },
-          { href: "/admin/users", label: "Users" },
-          { href: "/admin/moderation", label: "Moderation" },
-        ]
-      : [];
+  const studentNavItems = [
+    { href: "/mood-tracker", label: "Mood Tracker" },
+    { href: "/calendar", label: "Calendar" },
+    { href: "/journal", label: "Journal" },
+    { href: "/forum", label: "Peer Forum" },
+    { href: "/focus-tool", label: "Focus" },
+    { href: "/resources", label: "Resources" },
+  ];
 
+  const managementNavItems = [
+      { href: "/admin", label: "Analytics" },
+      { href: "/admin/users", label: "Users" },
+      { href: "/admin/moderation", label: "Moderation" },
+      { href: "/dashboard", label: "Student Dashboard" },
+  ];
+  
   const navItems = (role === 'admin' || role === 'management') 
-    ? [primaryNavItem, ...managementNavItems, ...studentNavItems]
-    : [
-        primaryNavItem,
-        { href: "/mood-tracker", label: "Mood Tracker" },
-        { href: "/calendar", label: "Calendar" },
-        { href: "/journal", label: "Journal" },
-        { href: "/forum", label: "Peer Forum" },
-        { href: "/focus-tool", label: "Focus" },
-        { href: "/resources", label: "Resources" },
-      ];
+    ? [primaryNavItem, ...managementNavItems]
+    : [primaryNavItem, ...studentNavItems];
 
 
   return (
