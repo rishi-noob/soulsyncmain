@@ -77,7 +77,7 @@ export default function AuthPage() {
         }
 
         // Check password
-        const isPrivileged = Object.keys(privilegedPasswords).includes(values.email);
+        const isPrivileged = ['management', 'admin', 'volunteer'].includes(userExists.role);
         let passwordIsValid = false;
 
         if (isPrivileged) {
@@ -312,5 +312,3 @@ export default function AuthPage() {
     </div>
   );
 }
-
-    
