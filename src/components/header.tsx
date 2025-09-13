@@ -13,11 +13,10 @@ import { Menu } from "lucide-react";
 
 export function Header() {
   const pathname = usePathname();
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, user, role } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const navItems = [
-    { href: "/dashboard", label: "Home" },
+  const baseNavItems = [
     { href: "/mood-tracker", label: "Mood Tracker" },
     { href: "/calendar", label: "Calendar" },
     { href: "/journal", label: "Journal" },
@@ -25,6 +24,22 @@ export function Header() {
     { href: "/focus-tool", label: "Focus" },
     { href: "/resources", label: "Resources" },
   ];
+
+  let navItems = [];
+
+  switch (role) {
+    case 'admin':
+    case 'management':
+      navItems = [{ href: "/admin", label: "Analytics" }, ...baseNavItems];
+      break;
+    case 'volunteer':
+      navItems = [{ href: "/volunteer", label: "Volunteer Hub" }, ...baseNavItems];
+      break;
+    default: // student
+      navItems = [{ href: "/dashboard", label: "Home" }, ...baseNavItems];
+      break;
+  }
+  
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -103,10 +118,12 @@ export function Header() {
                 <Link href="/booking">Book a Session</Link>
              </Button>
            )}
-          {isAuthenticated ? (
+          {isAuthenticated && user ? (
             <UserNav />
           ) : (
-            <Button onClick={() => login('student')}>Login/Profile</Button>
+             <Button asChild>
+                <Link href="/">Login / Sign Up</Link>
+             </Button>
           )}
         </div>
       </div>

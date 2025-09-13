@@ -49,19 +49,22 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link href="/dashboard">Profile</Link>
-          </DropdownMenuItem>
-          {role === 'management' && (
+          {(role === 'admin' || role === 'management') && (
              <DropdownMenuItem asChild>
-                <Link href="/admin">Management Dashboard</Link>
+                <Link href="/admin">Management</Link>
              </DropdownMenuItem>
           )}
            {role === 'volunteer' && (
              <DropdownMenuItem asChild>
-                <Link href="/volunteer">Volunteer Dashboard</Link>
+                <Link href="/volunteer">Volunteer Hub</Link>
              </DropdownMenuItem>
           )}
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard">Student Dashboard</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/booking">Booking</Link>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>
