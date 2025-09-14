@@ -8,10 +8,22 @@ import { ArrowRight, BookCopy, Calendar, HeartPulse, MessageCircle, ShieldCheck,
 import Link from "next/link";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function DashboardPage() {
   const { user, isAuthenticated, role } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    // Redirect non-students to their respective dashboards
+    if (isAuthenticated && role && role !== 'student') {
+      if (role === 'admin' || role === 'management') {
+        router.replace('/admin');
+      } else if (role === 'volunteer') {
+        router.replace('/volunteer');
+      }
+    }
+  }, [isAuthenticated, role, router]);
 
   const mainFeatures = [
     {
@@ -79,23 +91,9 @@ export default function DashboardPage() {
       },
   ];
 
-  // Redirect non-students to their respective dashboards
-  if (isAuthenticated && role && role !== 'student') {
-    if (role === 'admin' || role === 'management') {
-      router.replace('/admin');
-    } else if (role === 'volunteer') {
-      router.replace('/volunteer');
-    }
-    return (
-        <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
-            <Icons.logo className="h-8 w-8 animate-pulse text-primary" />
-            <p className="text-muted-foreground">Redirecting...</p>
-        </div>
-    );
-  }
-
-  if (!isAuthenticated || !user) {
-    // This should be handled by the layout guard, but as a fallback:
+  // If the user is not a student, they will be redirected by the useEffect hook.
+  // Show a loading state while the redirect is happening.
+  if (!user || role !== 'student') {
      return (
         <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
             <Icons.logo className="h-8 w-8 animate-pulse text-primary" />
@@ -193,5 +191,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
