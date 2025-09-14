@@ -15,7 +15,7 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect non-students to their respective dashboards
+    // This logic runs on the client-side after rendering, preventing the "setState in render" error.
     if (isAuthenticated && role && role !== 'student') {
       if (role === 'admin' || role === 'management') {
         router.replace('/admin');

@@ -3,16 +3,15 @@ import {NextRequest, NextResponse} from 'next/server';
 
 const PROTECTED_ROUTES: Record<string, string[]> = {
   '/admin': ['admin', 'management'],
-  '/admin/moderation': ['admin', 'management'],
-  '/admin/users': ['admin', 'management'],
   '/volunteer': ['admin', 'management', 'volunteer'],
 };
 
-const routes = Object.keys(PROTECTED_ROUTES);
+// This matcher will protect all routes under /admin and /volunteer
+const protectedPaths = Object.keys(PROTECTED_ROUTES);
 
 export function middleware(request: NextRequest) {
   const sessionUserCookie = request.cookies.get('soul-sync-session-user');
-  let userRole = 'student'; // Default to least privileged role
+  let userRole: string | null = null;
 
   if (sessionUserCookie) {
     try {
@@ -22,18 +21,18 @@ export function middleware(request: NextRequest) {
       }
     } catch (e) {
       // Invalid JSON in cookie, treat as unauthenticated
-      userRole = 'student';
+      userRole = null;
     }
   }
 
   const {pathname} = request.nextUrl;
 
-  const protectedRoute = routes.find(route => pathname.startsWith(route));
+  const protectedRoute = protectedPaths.find(route => pathname.startsWith(route));
 
   if (protectedRoute) {
     const allowedRoles = PROTECTED_ROUTES[protectedRoute];
-    if (!allowedRoles.includes(userRole)) {
-      // If user's role is not allowed, redirect to their dashboard
+    if (!userRole || !allowedRoles.includes(userRole)) {
+      // If user is not logged in or their role is not allowed, redirect to their dashboard
       const url = request.nextUrl.clone();
       url.pathname = '/dashboard';
       return NextResponse.redirect(url);
