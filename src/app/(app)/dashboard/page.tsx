@@ -15,7 +15,6 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // This logic runs on the client-side after rendering, preventing the "setState in render" error.
     if (isAuthenticated && role && role !== 'student') {
       if (role === 'admin' || role === 'management') {
         router.replace('/admin');
@@ -91,8 +90,6 @@ export default function DashboardPage() {
       },
   ];
 
-  // While the initial authentication check is running, or if redirection is about to happen,
-  // show a loading state. This prevents content flashing for non-student roles.
   if (!user || (isAuthenticated && role !== 'student')) {
      return (
         <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
@@ -104,7 +101,6 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col flex-1">
-        {/* Hero Section */}
         <section className="container relative py-24 sm:py-32 lg:py-40 text-center">
              <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 -top-20 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-40">
                 <div
@@ -122,7 +118,6 @@ export default function DashboardPage() {
             </p>
         </section>
 
-        {/* Main Features Section */}
         <section id="features" className="container py-16 scroll-mt-20">
             <div className="text-center mb-12">
                 <h2 className="text-3xl font-bold font-headline sm:text-4xl">Main Features</h2>
@@ -146,7 +141,6 @@ export default function DashboardPage() {
             </div>
         </section>
 
-        {/* Wellness Tools Section */}
         <section className="container py-16">
             <div className="text-center mb-12">
                 <h2 className="text-3xl font-bold font-headline sm:text-4xl">Wellness Tools</h2>
@@ -170,7 +164,6 @@ export default function DashboardPage() {
             </div>
         </section>
 
-        {/* Footer */}
         <footer id="contact" className="mt-auto bg-muted/20 scroll-mt-20">
             <div className="container py-12">
                  <div className="flex flex-col md:flex-row justify-between items-center gap-8">
