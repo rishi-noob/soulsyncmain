@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -16,15 +17,13 @@ export function Header() {
   const { isAuthenticated, user, role } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const homeItem = { href: "/dashboard", label: "Home" };
-
+  // Define navigation items for different states
   const studentNavItems = [
-    homeItem,
+    { href: "/dashboard", label: "Dashboard" },
     { href: "/mood-tracker", label: "Mood Tracker" },
     { href: "/calendar", label: "Calendar" },
     { href: "/journal", label: "Journal" },
     { href: "/forum", label: "Peer Forum" },
-    { href: "/focus-tool", label: "Focus" },
     { href: "/resources", label: "Resources" },
   ];
 
@@ -35,8 +34,17 @@ export function Header() {
       { href: "/dashboard", label: "Student View" },
   ];
   
+  const publicNavItems = [
+    { href: "/login", label: "Home" },
+    { href: "/login#features", label: "Features" },
+    { href: "/resources", label: "Resources" },
+    { href: "/login#contact", label: "Contact Us" },
+  ];
+
   let navItems;
-  if (role === 'admin' || role === 'management') {
+  if (!isAuthenticated) {
+    navItems = publicNavItems;
+  } else if (role === 'admin' || role === 'management') {
     navItems = managementNavItems;
   } else {
     navItems = studentNavItems;
@@ -64,13 +72,13 @@ export function Header() {
               </SheetHeader>
               <div className="flex flex-col h-full">
                 <div className="flex items-center mb-8">
-                    <Link href="/dashboard" className="mr-6 flex items-center space-x-2" onClick={() => setIsSheetOpen(false)}>
+                    <Link href={isAuthenticated ? "/dashboard" : "/login"} className="mr-6 flex items-center space-x-2" onClick={() => setIsSheetOpen(false)}>
                         <Icons.logo className="h-6 w-6 text-primary" />
                         <span className="font-bold font-headline tracking-wider">SOUL SYNC</span>
                     </Link>
                 </div>
                 <nav className="flex flex-col gap-4">
-                  {isAuthenticated && navItems.map((item) => (
+                  {navItems.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
@@ -85,28 +93,32 @@ export function Header() {
                   ))}
                 </nav>
                  <div className="mt-auto">
-                    {isAuthenticated && (
-                    <Button asChild className="w-full" onClick={() => setIsSheetOpen(false)}>
-                        <Link href="/booking">Book a Session</Link>
-                    </Button>
+                    {isAuthenticated ? (
+                      <Button asChild className="w-full" onClick={() => setIsSheetOpen(false)}>
+                          <Link href="/booking">Book a Session</Link>
+                      </Button>
+                    ) : (
+                       <Button asChild className="w-full" onClick={() => setIsSheetOpen(false)}>
+                          <Link href="/login#signup">Sign Up</Link>
+                       </Button>
                     )}
                 </div>
               </div>
             </SheetContent>
           </Sheet>
 
-          <Link href="/dashboard" className="mr-6 flex items-center space-x-2">
+          <Link href={isAuthenticated ? "/dashboard" : "/login"} className="mr-6 flex items-center space-x-2">
             <Icons.logo className="h-6 w-6 text-primary" />
             <span className="hidden sm:inline-block font-bold font-headline tracking-wider">SOUL SYNC</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm">
-            {isAuthenticated && navItems.map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
                   "transition-colors hover:text-foreground/80",
-                  (pathname.startsWith(item.href) && item.href !== '/dashboard') || pathname === item.href
+                  (pathname === item.href && item.href !== '/dashboard' && item.href !== '/login') || pathname === item.href
                     ? "text-foreground"
                     : "text-foreground/60"
                 )}
@@ -117,16 +129,16 @@ export function Header() {
           </nav>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2 sm:space-x-4">
-           {isAuthenticated && (
-             <Button asChild className="hidden sm:inline-flex">
-                <Link href="/booking">Book a Session</Link>
-             </Button>
-           )}
           {isAuthenticated && user ? (
-            <UserNav />
+            <>
+              <Button asChild className="hidden sm:inline-flex">
+                  <Link href="/booking">Book a Session</Link>
+              </Button>
+              <UserNav />
+            </>
           ) : (
              <Button asChild>
-                <Link href="/login">Login / Sign Up</Link>
+                <Link href="/login#signup">Sign Up</Link>
              </Button>
           )}
         </div>
@@ -134,3 +146,5 @@ export function Header() {
     </header>
   );
 }
+
+    

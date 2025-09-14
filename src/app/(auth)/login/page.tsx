@@ -1,3 +1,4 @@
+
 "use client";
 
 import { BrainCircuit, Eye, EyeOff } from "lucide-react";
@@ -15,6 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { User } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { Icons } from "@/components/icons";
+import Link from "next/link";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -28,13 +30,97 @@ const signupSchema = z.object({
 });
 
 export default function LoginPage() {
-  const { login, isAuthenticated, allUsers, addUser, user } = useAuth();
+  const { login, isAuthenticated, allUsers, addUser } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [isAuthenticated, router]);
+
+  if (isAuthenticated) {
+     return (
+        <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
+            <Icons.logo className="h-8 w-8 animate-pulse text-primary" />
+            <p className="text-muted-foreground">Redirecting to dashboard...</p>
+        </div>
+    );
+  }
+
+
+  return (
+    <div className="flex flex-col flex-1">
+        {/* Hero Section */}
+        <section className="container relative flex-grow flex items-center justify-center text-center py-24 sm:py-32 lg:py-40">
+             <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 -top-20 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-40">
+                <div
+                    style={{
+                        clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)'
+                    }}
+                    className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#a855f7] to-[#6d28d9] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+                />
+            </div>
+            <div className="max-w-4xl">
+                 <h1 className="text-4xl font-bold tracking-tighter font-headline sm:text-6xl md:text-7xl lg:text-8xl">
+                    <span className="text-primary">Soul Sync</span><br />
+                    Your Companion for <br />
+                    Mental Wellness
+                </h1>
+                <p className="mt-6 text-lg max-w-prose mx-auto text-muted-foreground">
+                    Accessible, stigma-free, and structured mental health support for students.
+                </p>
+                <div className="mt-10 flex items-center justify-center gap-x-6">
+                    <Button asChild size="lg">
+                        <Link href="#signup">Get Started</Link>
+                    </Button>
+                </div>
+            </div>
+        </section>
+
+        {/* Features Section */}
+        <section id="features" className="container py-16 scroll-mt-20">
+             <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold font-headline sm:text-4xl">Features</h2>
+                <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">A comprehensive toolkit for your mental well-being journey.</p>
+            </div>
+            {/* You can add feature cards here if you wish */}
+        </section>
+
+
+        {/* Auth Section */}
+        <section id="signup" className="container py-16 scroll-mt-20">
+             <AuthTabs />
+        </section>
+
+        {/* Footer */}
+        <footer id="contact" className="mt-auto bg-muted/20 scroll-mt-20">
+            <div className="container py-24 sm:py-32">
+                <div className="mx-auto max-w-4xl text-center">
+                    <h2 className="text-3xl font-bold font-headline sm:text-4xl">Contact Us</h2>
+                    <p className="mt-4 text-muted-foreground">
+                        Have questions or feedback? We'd love to hear from you.
+                    </p>
+                    {/* Add a contact form here if needed */}
+                     <div className="mt-10">
+                        <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} SoulSync. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+  );
+}
+
+
+function AuthTabs() {
+  const { login, allUsers, addUser } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState("login");
+  const [activeTab, setActiveTab] = useState("signup");
   
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -45,13 +131,6 @@ export default function LoginPage() {
     resolver: zodResolver(signupSchema),
     defaultValues: { name: "", email: "", password: "" },
   });
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace("/dashboard");
-    }
-  }, [isAuthenticated, router]);
-
 
   const handleLogin = (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
@@ -94,7 +173,7 @@ export default function LoginPage() {
         addUser(newUser, values.password);
 
         toast({
-            title: "Account created. Please sign in.",
+            title: "Account created! You can now sign in.",
             description: "Your new account has been successfully created."
         });
         
@@ -105,20 +184,9 @@ export default function LoginPage() {
         setIsLoading(false);
     }, 500);
   };
-
-  if (user === undefined || isAuthenticated) {
-    return (
-        <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
-            <Icons.logo className="h-8 w-8 animate-pulse text-primary" />
-            <p className="text-muted-foreground">Redirecting...</p>
-        </div>
-    );
-  }
-
-
+    
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-md">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-md mx-auto">
         <div className="flex justify-center mb-4">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Sign In</TabsTrigger>
@@ -202,7 +270,7 @@ export default function LoginPage() {
                  <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
                     <BrainCircuit className="h-10 w-10 text-primary" />
                 </div>
-              <CardTitle className="text-3xl font-bold font-headline tracking-tight">Create a Student Account</CardTitle>
+              <CardTitle className="text-3xl font-bold font-headline tracking-tight">Create an Account</CardTitle>
               <CardDescription>Join SoulSync to take control of your well-being.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -278,6 +346,7 @@ export default function LoginPage() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
   );
 }
+
+    

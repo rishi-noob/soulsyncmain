@@ -6,24 +6,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookCopy, Calendar, HeartPulse, MessageCircle, ShieldCheck, Sparkles, Users, Wind } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { Icons } from "@/components/icons";
 
 export default function DashboardPage() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, role } = useAuth();
 
-  if (!isAuthenticated || !user) {
-    return (
-       <div className="container mx-auto p-8 text-center">
-            <h1 className="text-2xl font-bold">Please log in</h1>
-            <p className="text-muted-foreground">You need to be logged in to view the dashboard.</p>
-            <Button asChild className="mt-4"><Link href="/">Sign In</Link></Button>
-       </div>
-    );
-  }
-  
   const mainFeatures = [
     {
+        id: "ai-companion",
         icon: <Sparkles className="h-8 w-8 text-primary" />,
         title: "AI Companion",
         description: "Chat with an AI assistant for personalized advice and coping strategies, available 24/7.",
@@ -31,6 +21,7 @@ export default function DashboardPage() {
         cta: "Chat Now"
     },
     {
+        id: "community",
         icon: <Users className="h-8 w-8 text-primary" />,
         title: "Community & Peer Support",
         description: "Connect with fellow students in a safe, moderated forum to share experiences and feel less alone.",
@@ -38,6 +29,7 @@ export default function DashboardPage() {
         cta: "Visit Forum"
     },
     {
+        id: "resources",
         icon: <BookCopy className="h-8 w-8 text-primary" />,
         title: "Self-Help Resources",
         description: "Access a curated library of articles, videos, and tools to learn about mental wellness at your own pace.",
@@ -45,13 +37,14 @@ export default function DashboardPage() {
         cta: "Browse Resources"
     },
     {
+        id: "consultation",
         icon: <ShieldCheck className="h-8 w-8 text-primary" />,
         title: "Expert Consultation",
         description: "Schedule a confidential one-on-one session with a licensed professional to get expert guidance.",
         href: "/booking",
         cta: "Book a Session"
     }
-  ]
+  ];
 
   const wellnessTools = [
       {
@@ -82,7 +75,32 @@ export default function DashboardPage() {
         href: "/focus-tool",
         cta: "Start Focus"
       },
-  ]
+  ];
+
+  // Redirect non-students to their respective dashboards
+  if (isAuthenticated && role && role !== 'student') {
+    if (role === 'admin' || role === 'management') {
+      window.location.href = '/admin';
+    } else if (role === 'volunteer') {
+      window.location.href = '/volunteer';
+    }
+    return (
+        <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
+            <Icons.logo className="h-8 w-8 animate-pulse text-primary" />
+            <p className="text-muted-foreground">Redirecting...</p>
+        </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    // This should be handled by the layout guard, but as a fallback:
+     return (
+        <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
+            <Icons.logo className="h-8 w-8 animate-pulse text-primary" />
+            <p className="text-muted-foreground">Loading dashboard...</p>
+        </div>
+    );
+  }
 
   return (
     <div className="flex flex-col flex-1">
@@ -100,12 +118,16 @@ export default function DashboardPage() {
                 Hello, {user.name.split(' ')[0]}!
             </h1>
             <p className="mt-6 text-lg max-w-prose mx-auto text-muted-foreground">
-                Ready to start your day with a clear mind? Let's take a look at the tools and resources available for you.
+                Ready to start your day with a clear mind? Here are the tools and resources available for you.
             </p>
         </section>
 
         {/* Main Features Section */}
-        <section className="container py-16">
+        <section id="features" className="container py-16 scroll-mt-20">
+            <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold font-headline sm:text-4xl">Main Features</h2>
+                <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">Your primary tools for support and connection.</p>
+            </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {mainFeatures.map(feature => (
                      <Card key={feature.title} className="h-full flex flex-col">
@@ -149,7 +171,7 @@ export default function DashboardPage() {
         </section>
 
         {/* Footer */}
-        <footer className="mt-auto bg-muted/20">
+        <footer id="contact" className="mt-auto bg-muted/20 scroll-mt-20">
             <div className="container py-12">
                  <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                      <div className="flex items-center space-x-2">
@@ -166,7 +188,8 @@ export default function DashboardPage() {
                  </div>
             </div>
         </footer>
-
     </div>
   );
 }
+
+    
