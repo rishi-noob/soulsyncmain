@@ -1,19 +1,23 @@
+
 "use client";
 
 import { useAuth } from "@/context/auth-context";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Icons } from "./icons";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (user === null) {
-      router.push("/");
+    // If we're checking auth and the user is not logged in, and they are not on the landing page,
+    // redirect them to the login page.
+    if (user === null && pathname !== '/') {
+      router.push("/login");
     }
-  }, [user, router]);
+  }, [user, router, pathname]);
 
   if (!isAuthenticated) {
     return (

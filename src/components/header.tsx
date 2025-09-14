@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -34,9 +35,11 @@ export function Header() {
       { href: "/dashboard", label: "Student Dashboard" },
   ];
   
-  const navItems = (role === 'admin' || role === 'management') 
-    ? [primaryNavItem, ...managementNavItems]
-    : [primaryNavItem, ...studentNavItems];
+  let navItems = [primaryNavItem, ...studentNavItems];
+
+  if (role === 'admin' || role === 'management') {
+    navItems = [primaryNavItem, ...managementNavItems];
+  }
 
 
   return (
@@ -122,7 +125,7 @@ export function Header() {
             <UserNav />
           ) : (
              <Button asChild>
-                <Link href="/">Login / Sign Up</Link>
+                <Link href="/login">Login / Sign Up</Link>
              </Button>
           )}
         </div>

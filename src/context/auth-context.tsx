@@ -87,25 +87,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (email: string, password?: string): User | null => {
     const userToLogin = Object.values(allUsers).find(u => u.email === email);
-
+    
     if (!userToLogin) {
       return null;
     }
 
-    // For privileged roles, we MUST check the password.
-    // For this demo, any role that is NOT 'student' is considered privileged.
     if (userToLogin.role !== 'student') {
       if (userToLogin.password === password) {
         setUser(userToLogin);
         handleRedirect(userToLogin.role);
         return userToLogin;
       } else {
-        // Correct password was not provided for a privileged account.
         return null;
       }
     }
 
-    // For student roles, no password check is needed for this demo app
     setUser(userToLogin);
     handleRedirect(userToLogin.role);
     return userToLogin;

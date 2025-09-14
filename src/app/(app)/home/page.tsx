@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useAuth } from "@/context/auth-context";
@@ -15,7 +16,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push("/");
+      router.push("/login");
       return;
     }
 
