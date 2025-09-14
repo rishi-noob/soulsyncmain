@@ -12,21 +12,20 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     // If the auth state is resolved and the user is null (not logged in),
     // redirect them to the login page.
-    if (user === null) {
+    if (isAuthenticated === false) {
       router.replace("/login");
     }
-  }, [user, router]);
+  }, [isAuthenticated, router]);
 
   // While the initial authentication check is running, `user` is `undefined`.
   // We show a loading screen to prevent a flicker of protected content.
-  // Also, if the user is null, we show loading while the redirect to /login is in progress.
-  if (user === undefined || user === null) {
+  if (isAuthenticated === undefined || isAuthenticated === false) {
      return (
         <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
             <Icons.logo className="h-8 w-8 animate-pulse text-primary" />

@@ -17,7 +17,6 @@ export function Header() {
   const { isAuthenticated, user, role } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  // Student nav is simple, as requested
   const studentNavItems = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/mood-tracker", label: "Mood Tracker" },
@@ -33,7 +32,13 @@ export function Header() {
       { href: "/admin/moderation", label: "Moderation" },
       { href: "/dashboard", label: "Student View" },
   ];
-  
+
+  const volunteerNavItems = [
+      { href: "/volunteer", label: "Volunteer Hub"},
+      { href: "/forum", label: "Forum"},
+      { href: "/resources", label: "Resources"},
+  ];
+
   const publicNavItems = [
     { href: "/login", label: "Home" },
   ];
@@ -44,17 +49,13 @@ export function Header() {
   } else if (role === 'admin' || role === 'management') {
     navItems = managementNavItems;
   } else if (role === 'volunteer') {
-    // Basic nav for volunteer, can be expanded
-    navItems = [
-        { href: "/volunteer", label: "Volunteer Hub"},
-        { href: "/forum", label: "Forum"},
-        { href: "/resources", label: "Resources"},
-    ];
+    navItems = volunteerNavItems;
   }
   else {
-    // This is the student view
     navItems = studentNavItems;
   }
+
+  const isStudentDashboard = isAuthenticated && role === 'student';
 
 
   return (
@@ -67,7 +68,6 @@ export function Header() {
                 variant="ghost"
                 size="icon"
                 className="md:hidden mr-2"
-                // Only show menu if authenticated
                 style={{ visibility: isAuthenticated ? 'visible' : 'hidden' }}
               >
                 <Menu className="h-5 w-5" />
@@ -116,9 +116,9 @@ export function Header() {
             <span className="hidden sm:inline-block font-bold font-headline tracking-wider">SOUL SYNC</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm">
-             {isAuthenticated && role === 'student' ? (
+             {isStudentDashboard ? (
                 <>
-                {/* Intentionally empty for students as per request, dashboard is the main page */}
+                {/* Intentionally empty for students on dashboard, nav is on page */}
                 </>
              ) : (
                 <>
@@ -141,7 +141,7 @@ export function Header() {
         <div className="flex flex-1 items-center justify-end space-x-2 sm:space-x-4">
           {isAuthenticated && user ? (
             <>
-              <Button asChild className="hidden sm:inline-flex">
+              <Button asChild>
                   <Link href="/booking">Book a Session</Link>
               </Button>
               <UserNav />
@@ -156,5 +156,3 @@ export function Header() {
     </header>
   );
 }
-
-    

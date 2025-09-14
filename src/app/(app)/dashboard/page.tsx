@@ -4,7 +4,7 @@
 import { useAuth } from "@/context/auth-context";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BookCopy, Calendar, HeartPulse, MessageCircle, ShieldCheck, Sparkles, Users, Wind } from "lucide-react";
+import { ArrowRight, BookCopy, Calendar, HeartPulse, MessageCircle, Sparkles, Users, Wind, Check, BarChart } from "lucide-react";
 import Link from "next/link";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
@@ -52,7 +52,7 @@ export default function DashboardPage() {
     },
     {
         id: "consultation",
-        icon: <ShieldCheck className="h-8 w-8 text-primary" />,
+        icon: <HeartPulse className="h-8 w-8 text-primary" />,
         title: "Expert Consultation",
         description: "Schedule a confidential one-on-one session with a licensed professional to get expert guidance.",
         href: "/booking",
@@ -108,7 +108,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col flex-1 animate-in fade-in-50 slide-in-from-bottom-8 duration-500">
-        <section className="container relative py-16 text-center sm:py-24 md:py-32">
+        <section className="container relative py-16 text-center sm:py-24">
              <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 -top-20 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-40">
                 <div
                     style={{
@@ -123,6 +123,52 @@ export default function DashboardPage() {
             <p className="mt-6 text-lg max-w-prose mx-auto text-muted-foreground">
                 Ready to start your day with a clear mind? Here are the tools and resources available for you.
             </p>
+            <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                <Card className="text-left">
+                    <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                           <Check className="h-5 w-5 text-primary"/> Mood Streak
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-2xl font-bold">{user.streak} Days</p>
+                    </CardContent>
+                </Card>
+                 <Card className="text-left">
+                    <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                           <Sparkles className="h-5 w-5 text-primary"/> Focus Points
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-2xl font-bold">{user.focusPoints}</p>
+                    </CardContent>
+                </Card>
+                 <Card className="text-left">
+                    <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                           <BarChart className="h-5 w-5 text-primary"/> Mood Average
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-2xl font-bold">3.8 / 5</p>
+                    </CardContent>
+                </Card>
+            </div>
+            <div className="mt-8 flex justify-center gap-4">
+                 <Button size="lg" asChild>
+                    <Link href="/mood-tracker">
+                        <HeartPulse className="mr-2"/>
+                        Log Today's Mood
+                    </Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                    <Link href="/chatbot">
+                        <MessageCircle className="mr-2"/>
+                        Chat with AI Companion
+                    </Link>
+                </Button>
+            </div>
         </section>
 
         <section id="features" className="container py-16 scroll-mt-20">
@@ -167,6 +213,7 @@ export default function DashboardPage() {
                              <CardFooter>
                                 <Button asChild variant="secondary" className="w-full">
                                     <Link href={tool.href}>{tool.cta}</Link>
+
                                 </Button>
                             </CardFooter>
                         </Card>
