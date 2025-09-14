@@ -17,9 +17,10 @@ export function Header() {
   const { isAuthenticated, user, role } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const primaryNavItem = { href: "/home", label: "Home" };
+  const homeItem = { href: "/home", label: "Home" };
 
   const studentNavItems = [
+    homeItem,
     { href: "/mood-tracker", label: "Mood Tracker" },
     { href: "/calendar", label: "Calendar" },
     { href: "/journal", label: "Journal" },
@@ -29,16 +30,19 @@ export function Header() {
   ];
 
   const managementNavItems = [
+      homeItem,
       { href: "/admin", label: "Analytics" },
       { href: "/admin/users", label: "Users" },
       { href: "/admin/moderation", label: "Moderation" },
       { href: "/dashboard", label: "Student Dashboard" },
   ];
   
-  let navItems = [primaryNavItem, ...studentNavItems];
-
+  let navItems;
   if (role === 'admin' || role === 'management') {
-    navItems = [primaryNavItem, ...managementNavItems];
+    navItems = managementNavItems;
+  } else {
+    // This includes 'student' and 'volunteer'
+    navItems = studentNavItems;
   }
 
 
@@ -105,7 +109,7 @@ export function Header() {
                 href={item.href}
                 className={cn(
                   "transition-colors hover:text-foreground/80",
-                  (pathname === item.href || (item.href === "/home" && (pathname === "/dashboard" || pathname === "/admin" || pathname === "/volunteer")))
+                  (pathname === item.href || (item.href === "/home" && (pathname === "/dashboard" || pathname.startsWith("/admin") || pathname === "/volunteer")))
                     ? "text-foreground"
                     : "text-foreground/60"
                 )}
@@ -125,7 +129,7 @@ export function Header() {
             <UserNav />
           ) : (
              <Button asChild>
-                <Link href="/login">Login / Sign Up</Link>
+                <Link href="/">Login / Sign Up</Link>
              </Button>
           )}
         </div>
