@@ -52,7 +52,7 @@ Once both processes are running, you can access the application in your browser.
 
 The best way to share your codebase with a friend or collaborator is by using Git and a code hosting platform like GitHub.
 
-### Steps to Share:
+### Initial Setup:
 
 1.  **Initialize a Git Repository:**
     If your project isn't already a Git repository, open a terminal in the project's root directory and run:
@@ -77,3 +77,22 @@ The best way to share your codebase with a friend or collaborator is by using Gi
 
 4.  **Share the Link:**
     You can now share the GitHub repository link with your friend. They can download the code or clone it using Git.
+
+### Committing Updates:
+
+Once your repository is set up, you can commit and push any new changes you make with the following commands:
+
+1.  **Stage All Changes:**
+    ```bash
+    git add .
+    ```
+
+2.  **Commit the Changes with a Message:**
+    ```bash
+    git commit -m "Add a descriptive message about your changes here"
+    ```
+
+3.  **Push the Commit to GitHub:**
+    ```bash
+    git push
+    ```
