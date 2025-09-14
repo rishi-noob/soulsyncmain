@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 export type UserRole = "student" | "volunteer" | "admin" | "counsellor" | "management";
 
 interface AuthContextType {
-  user: User | null;
+  user: User | null | undefined; // undefined means auth state is not yet known
   role: UserRole;
   isAuthenticated: boolean;
   allUsers: Record<string, User>;
@@ -16,34 +16,28 @@ interface AuthContextType {
   logout: () => void;
   setRole: (role: UserRole) => void;
   updateUser: (data: Partial<User>) => void;
-  addUser: (newUser: User) => void;
+  addUser: (newUser: User, password?: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const USERS_STORAGE_KEY = 'soul-sync-users';
+const SESSION_USER_KEY = 'soul-sync-session-user';
 
-// This function now correctly merges the base mockUsers with users from localStorage
+
 const getInitialUsers = (): Record<string, User> => {
     if (typeof window === 'undefined') {
         return mockUsers;
     }
     try {
         const storedUsersString = window.localStorage.getItem(USERS_STORAGE_KEY);
-        // Start with the base mock users to ensure privileged accounts are always present
         let combinedUsers = { ...mockUsers };
 
         if (storedUsersString) {
             const storedUsers = JSON.parse(storedUsersString);
-            // Merge stored users, giving precedence to stored data for non-privileged accounts
-            for (const userId in storedUsers) {
-                if (!mockUsers[userId] || mockUsers[userId].role === 'student') {
-                    combinedUsers[userId] = storedUsers[userId];
-                }
-            }
+            combinedUsers = { ...combinedUsers, ...storedUsers };
         }
         
-        // Persist the potentially merged list back to localStorage
         window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(combinedUsers));
         return combinedUsers;
     } catch (error) {
@@ -54,10 +48,35 @@ const getInitialUsers = (): Record<string, User> => {
 
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  // `undefined` represents the initial state where we don't know if the user is logged in or not.
+  // `null` means we've checked and they are not logged in.
+  // `User` object means they are logged in.
+  const [user, setUser] = useState<User | null | undefined>(undefined);
   const [allUsers, setAllUsers] = useState<Record<string, User>>(getInitialUsers);
   const router = useRouter();
 
+  // On initial load, check for a session user
+  useEffect(() => {
+    try {
+      const sessionUserString = window.sessionStorage.getItem(SESSION_USER_KEY);
+      if (sessionUserString) {
+        const sessionUser = JSON.parse(sessionUserString);
+        // Ensure the user from session storage still exists in our main user list
+        if (allUsers[sessionUser.id]) {
+           setUser(allUsers[sessionUser.id]);
+        } else {
+           setUser(null); // User doesn't exist anymore, so log them out.
+           window.sessionStorage.removeItem(SESSION_USER_KEY);
+        }
+      } else {
+        setUser(null); // No session user, so they are logged out.
+      }
+    } catch (e) {
+      setUser(null);
+    }
+  }, [allUsers]);
+
+  // Persist allUsers to localStorage whenever it changes
   useEffect(() => {
     try {
         window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(allUsers));
@@ -81,8 +100,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const addUser = (newUser: User) => {
-    setAllUsers(prev => ({ ...prev, [newUser.id]: newUser }));
+  const addUser = (newUser: User, password?: string) => {
+    const userWithPassword = password ? { ...newUser, password } : newUser;
+    setAllUsers(prev => ({ ...prev, [newUser.id]: userWithPassword }));
   };
 
   const login = (email: string, password?: string): User | null => {
@@ -92,23 +112,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return null;
     }
 
-    if (userToLogin.role !== 'student') {
-      if (userToLogin.password === password) {
-        setUser(userToLogin);
-        handleRedirect(userToLogin.role);
-        return userToLogin;
-      } else {
-        return null;
-      }
+    const isPasswordCorrect = userToLogin.password ? userToLogin.password === password : true;
+
+    if (isPasswordCorrect) {
+      setUser(userToLogin);
+      window.sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(userToLogin));
+      // No redirect here, the page component will handle it via useEffect
+      return userToLogin;
     }
 
-    setUser(userToLogin);
-    handleRedirect(userToLogin.role);
-    return userToLogin;
+    return null;
   };
 
   const logout = () => {
     setUser(null);
+    window.sessionStorage.removeItem(SESSION_USER_KEY);
     router.push('/');
   };
   
@@ -117,6 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const updatedUser = { ...user, role };
         setUser(updatedUser);
         setAllUsers(prev => ({...prev, [user.id]: updatedUser}));
+        window.sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(updatedUser));
     }
   };
 
@@ -125,6 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const updatedUser = { ...user, ...data };
         setUser(updatedUser);
         setAllUsers(prev => ({...prev, [user.id]: updatedUser}));
+        window.sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(updatedUser));
     }
   };
 

@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +16,7 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { User } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
+import { Icons } from "@/components/icons";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -30,7 +30,7 @@ const signupSchema = z.object({
 });
 
 export default function AuthPage() {
-  const { login, isAuthenticated, allUsers, addUser } = useAuth();
+  const { login, isAuthenticated, allUsers, addUser, user } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -48,11 +48,13 @@ export default function AuthPage() {
     defaultValues: { name: "", email: "", password: "" },
   });
 
+  // This effect handles redirecting the user if they are already authenticated.
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/dashboard");
     }
   }, [isAuthenticated, router]);
+
 
   const handleLogin = (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
@@ -62,6 +64,7 @@ export default function AuthPage() {
 
         if (loggedInUser) {
             toast({ title: "Login Successful", description: "Redirecting to your dashboard..." });
+            // The useEffect hook will handle the redirect
         } else {
             loginForm.setError("root", { type: "manual", message: "Invalid email or password." });
             setIsLoading(false);
@@ -91,17 +94,31 @@ export default function AuthPage() {
             treesPlanted: 0,
         };
         
-        addUser(newUser);
+        addUser(newUser, values.password); // Pass password for privileged account creation if needed
 
         toast({
-            title: "Account created. Sign in now.",
+            title: "Account created. Please sign in.",
+            description: "Your new account has been successfully created."
         });
         
         signupForm.reset();
         setActiveTab("login");
+        // Pre-fill login form for user convenience
+        loginForm.setValue("email", values.email);
+        loginForm.setValue("password", values.password);
         setIsLoading(false);
     }, 500);
   };
+
+  // While waiting for auth check or if already logged in, show a loading state
+  if (user === undefined || isAuthenticated) {
+    return (
+        <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
+            <Icons.logo className="h-8 w-8 animate-pulse text-primary" />
+            <p className="text-muted-foreground">Loading...</p>
+        </div>
+    );
+  }
 
 
   return (
@@ -258,7 +275,7 @@ export default function AuthPage() {
                     )}
                   />
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    Create Account
+                    {isLoading ? "Creating Account..." : "Create Account"}
                   </Button>
                 </form>
               </Form>
