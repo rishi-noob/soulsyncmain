@@ -3,12 +3,10 @@
 
 import { BarChart, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Line, Bar, CartesianGrid } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/context/auth-context";
 import { mockAdminStats } from '@/lib/data';
 import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 const moodChartConfig = {
   mood: {
@@ -32,16 +30,6 @@ const forumChartConfig = {
 } satisfies ChartConfig;
 
 export default function AdminPage() {
-  const { user, role } = useAuth();
-  
-  if (!user) {
-    return (
-      <div className="container mx-auto p-8 text-center">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="space-y-6">

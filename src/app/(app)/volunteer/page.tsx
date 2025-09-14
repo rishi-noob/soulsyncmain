@@ -1,7 +1,6 @@
 
 "use client";
 
-import { useAuth } from "@/context/auth-context";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FilePlus, Flag, MessageSquare } from "lucide-react";
@@ -24,18 +23,7 @@ const forumChartConfig = {
     }
 } satisfies ChartConfig;
 
-
 export default function VolunteerPage() {
-    const { user } = useAuth();
-
-    if (!user) {
-        return (
-            <div className="container mx-auto p-8 text-center">
-                <p>Loading...</p>
-            </div>
-        );
-    }
-
     return (
         <div className="container mx-auto p-4 md:p-8">
             <div className="space-y-6">

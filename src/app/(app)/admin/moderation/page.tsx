@@ -1,13 +1,11 @@
 
 "use client";
 
-import { useAuth } from "@/context/auth-context";
-import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Flag, Trash2, ShieldQuestion } from "lucide-react";
+import { CheckCircle, Trash2, ShieldQuestion } from "lucide-react";
 
 // Mock data for flagged content
 const flaggedContent = [
@@ -17,12 +15,6 @@ const flaggedContent = [
 ];
 
 export default function ModerationPage() {
-    const { user } = useAuth();
-    
-    if (!user) {
-        return <p>Loading...</p>;
-    }
-
     return (
         <div className="container mx-auto p-4 md:p-8">
             <div className="space-y-6">

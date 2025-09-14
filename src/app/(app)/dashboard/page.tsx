@@ -91,9 +91,9 @@ export default function DashboardPage() {
       },
   ];
 
-  // If the user is not a student, they will be redirected by the useEffect hook.
-  // Show a loading state while the redirect is happening.
-  if (!user || role !== 'student') {
+  // While the initial authentication check is running, or if redirection is about to happen,
+  // show a loading state. This prevents content flashing for non-student roles.
+  if (!user || (isAuthenticated && role !== 'student')) {
      return (
         <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
             <Icons.logo className="h-8 w-8 animate-pulse text-primary" />

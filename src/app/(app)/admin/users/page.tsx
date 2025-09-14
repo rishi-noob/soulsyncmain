@@ -13,24 +13,16 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function UserManagementPage() {
-  const { allUsers, setRole: setGlobalRole, role } = useAuth();
-
-  // A local state to manage role changes before saving them to the global context
+  const { allUsers, setRole: setGlobalRole } = useAuth();
   const [users, setUsers] = useState<User[]>(Object.values(allUsers));
-  
-  if (role !== 'admin' && role !== 'management') {
-    return <p>Unauthorized</p>;
-  }
 
   const handleRoleChange = (userId: string, newRole: UserRole) => {
     // Update local state first
     const updatedUsers = users.map(u => u.id === userId ? { ...u, role: newRole } : u);
     setUsers(updatedUsers);
     
-    // In a real app, you'd likely have a "Save Changes" button that calls the global context update.
-    // For simplicity here, we'll call it directly.
-    // NOTE: This updates the role for the CURRENT user if they change their own role. A better implementation
-    // would require re-authentication or be handled by a dedicated backend.
+    // This is a simplified example. In a real app, this would be an API call.
+    // For this context, we update the global state directly.
     setGlobalRole(newRole); 
   };
   
@@ -40,7 +32,6 @@ export default function UserManagementPage() {
     if (names.length > 1) return `${names[0][0]}${names[1][0]}`;
     return name.substring(0, 2);
   };
-
 
   return (
     <div className="container mx-auto p-4 md:p-8">
