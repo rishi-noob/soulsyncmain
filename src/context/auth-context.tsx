@@ -1,4 +1,3 @@
-
 "use client";
 
 import { User, mockUsers } from "@/lib/data";
@@ -48,35 +47,29 @@ const getInitialUsers = (): Record<string, User> => {
 
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // `undefined` represents the initial state where we don't know if the user is logged in or not.
-  // `null` means we've checked and they are not logged in.
-  // `User` object means they are logged in.
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [allUsers, setAllUsers] = useState<Record<string, User>>(getInitialUsers);
   const router = useRouter();
 
-  // On initial load, check for a session user
   useEffect(() => {
     try {
       const sessionUserString = window.sessionStorage.getItem(SESSION_USER_KEY);
       if (sessionUserString) {
         const sessionUser = JSON.parse(sessionUserString);
-        // Ensure the user from session storage still exists in our main user list
         if (allUsers[sessionUser.id]) {
            setUser(allUsers[sessionUser.id]);
         } else {
-           setUser(null); // User doesn't exist anymore, so log them out.
+           setUser(null); 
            window.sessionStorage.removeItem(SESSION_USER_KEY);
         }
       } else {
-        setUser(null); // No session user, so they are logged out.
+        setUser(null); 
       }
     } catch (e) {
       setUser(null);
     }
   }, [allUsers]);
 
-  // Persist allUsers to localStorage whenever it changes
   useEffect(() => {
     try {
         window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(allUsers));
@@ -84,21 +77,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error("Failed to write to localStorage", error);
     }
   }, [allUsers]);
-
-  const handleRedirect = (role: UserRole) => {
-    switch (role) {
-      case "management":
-      case "admin":
-        router.push('/admin');
-        break;
-      case "volunteer":
-        router.push('/volunteer');
-        break;
-      default:
-        router.push('/dashboard');
-        break;
-    }
-  }
 
   const addUser = (newUser: User, password?: string) => {
     const userWithPassword = password ? { ...newUser, password } : newUser;
@@ -117,7 +95,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (isPasswordCorrect) {
       setUser(userToLogin);
       window.sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(userToLogin));
-      // No redirect here, the page component will handle it via useEffect
       return userToLogin;
     }
 
@@ -127,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     window.sessionStorage.removeItem(SESSION_USER_KEY);
-    router.push('/');
+    router.push('/login');
   };
   
   const setRole = (role: UserRole) => {

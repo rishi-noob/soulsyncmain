@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -33,14 +32,13 @@ export function Header() {
       { href: "/admin", label: "Analytics" },
       { href: "/admin/users", label: "Users" },
       { href: "/admin/moderation", label: "Moderation" },
-      { href: "/dashboard", label: "Student Dashboard" },
+      { href: "/dashboard", label: "Student View" },
   ];
   
   let navItems;
   if (role === 'admin' || role === 'management') {
     navItems = managementNavItems;
   } else {
-    // This includes 'student' and 'volunteer'
     navItems = studentNavItems;
   }
 
@@ -108,7 +106,7 @@ export function Header() {
                 href={item.href}
                 className={cn(
                   "transition-colors hover:text-foreground/80",
-                  (pathname === item.href || (item.href === "/dashboard" && pathname.startsWith("/admin")))
+                  (pathname.startsWith(item.href) && item.href !== '/dashboard') || pathname === item.href
                     ? "text-foreground"
                     : "text-foreground/60"
                 )}
@@ -128,7 +126,7 @@ export function Header() {
             <UserNav />
           ) : (
              <Button asChild>
-                <Link href="/">Login / Sign Up</Link>
+                <Link href="/login">Login / Sign Up</Link>
              </Button>
           )}
         </div>

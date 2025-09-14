@@ -1,3 +1,5 @@
+"use client";
+
 import { Header } from "@/components/header";
 import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
@@ -8,24 +10,22 @@ interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-// This is a client component because it uses hooks (useAuth, useRouter, useEffect)
-"use client";
-
 export default function AppLayout({ children }: AppLayoutProps) {
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
 
-  // On initial load, check for a session user. If they are not logged in (user is null),
-  // redirect them to the home/login page. This effect runs when the auth state is resolved.
   useEffect(() => {
+    // If the auth state is resolved and the user is null (not logged in),
+    // redirect them to the login page.
     if (user === null) {
-      router.push("/");
+      router.replace("/login");
     }
   }, [user, router]);
 
   // While the initial authentication check is running, `user` is `undefined`.
-  // We show a loading screen to prevent a flicker of the page content.
-  if (user === undefined || !isAuthenticated) {
+  // We show a loading screen to prevent a flicker of protected content.
+  // Also, if the user is null, we show loading while the redirect to /login is in progress.
+  if (user === undefined || user === null) {
      return (
         <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">
             <Icons.logo className="h-8 w-8 animate-pulse text-primary" />
