@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, BookCopy, Calendar, HeartPulse, MessageCircle, ShieldCheck, Sparkles, Users, Wind } from "lucide-react";
 import Link from "next/link";
 import { Icons } from "@/components/icons";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const { user, isAuthenticated, role } = useAuth();
+  const router = useRouter();
 
   const mainFeatures = [
     {
@@ -80,9 +82,9 @@ export default function DashboardPage() {
   // Redirect non-students to their respective dashboards
   if (isAuthenticated && role && role !== 'student') {
     if (role === 'admin' || role === 'management') {
-      window.location.href = '/admin';
+      router.replace('/admin');
     } else if (role === 'volunteer') {
-      window.location.href = '/volunteer';
+      router.replace('/volunteer');
     }
     return (
         <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-background">

@@ -17,7 +17,7 @@ export function Header() {
   const { isAuthenticated, user, role } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  // Define navigation items for different states
+  // Student nav is simple, as requested
   const studentNavItems = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/mood-tracker", label: "Mood Tracker" },
@@ -36,9 +36,6 @@ export function Header() {
   
   const publicNavItems = [
     { href: "/login", label: "Home" },
-    { href: "/login#features", label: "Features" },
-    { href: "/resources", label: "Resources" },
-    { href: "/login#contact", label: "Contact Us" },
   ];
 
   let navItems;
@@ -46,7 +43,16 @@ export function Header() {
     navItems = publicNavItems;
   } else if (role === 'admin' || role === 'management') {
     navItems = managementNavItems;
-  } else {
+  } else if (role === 'volunteer') {
+    // Basic nav for volunteer, can be expanded
+    navItems = [
+        { href: "/volunteer", label: "Volunteer Hub"},
+        { href: "/forum", label: "Forum"},
+        { href: "/resources", label: "Resources"},
+    ];
+  }
+  else {
+    // This is the student view
     navItems = studentNavItems;
   }
 
@@ -61,6 +67,8 @@ export function Header() {
                 variant="ghost"
                 size="icon"
                 className="md:hidden mr-2"
+                // Only show menu if authenticated
+                style={{ visibility: isAuthenticated ? 'visible' : 'hidden' }}
               >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle Menu</span>
@@ -93,14 +101,10 @@ export function Header() {
                   ))}
                 </nav>
                  <div className="mt-auto">
-                    {isAuthenticated ? (
+                    {isAuthenticated && (
                       <Button asChild className="w-full" onClick={() => setIsSheetOpen(false)}>
                           <Link href="/booking">Book a Session</Link>
                       </Button>
-                    ) : (
-                       <Button asChild className="w-full" onClick={() => setIsSheetOpen(false)}>
-                          <Link href="/login#signup">Sign Up</Link>
-                       </Button>
                     )}
                 </div>
               </div>
@@ -112,20 +116,26 @@ export function Header() {
             <span className="hidden sm:inline-block font-bold font-headline tracking-wider">SOUL SYNC</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "transition-colors hover:text-foreground/80",
-                  (pathname === item.href && item.href !== '/dashboard' && item.href !== '/login') || pathname === item.href
-                    ? "text-foreground"
-                    : "text-foreground/60"
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
+             {isAuthenticated && role === 'student' ? (
+                <>
+                {/* Intentionally empty for students as per request, dashboard is the main page */}
+                </>
+             ) : (
+                <>
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "transition-colors hover:text-foreground/80",
+                        pathname === item.href ? "text-foreground" : "text-foreground/60"
+                      )}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </>
+             )}
           </nav>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2 sm:space-x-4">
@@ -138,7 +148,7 @@ export function Header() {
             </>
           ) : (
              <Button asChild>
-                <Link href="/login#signup">Sign Up</Link>
+                <Link href="/login">Sign In</Link>
              </Button>
           )}
         </div>
