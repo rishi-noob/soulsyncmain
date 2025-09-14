@@ -17,7 +17,7 @@ export function Header() {
   const { isAuthenticated, user, role } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const homeItem = { href: "/home", label: "Home" };
+  const homeItem = { href: "/dashboard", label: "Home" };
 
   const studentNavItems = [
     homeItem,
@@ -30,7 +30,6 @@ export function Header() {
   ];
 
   const managementNavItems = [
-      homeItem,
       { href: "/admin", label: "Analytics" },
       { href: "/admin/users", label: "Users" },
       { href: "/admin/moderation", label: "Moderation" },
@@ -67,7 +66,7 @@ export function Header() {
               </SheetHeader>
               <div className="flex flex-col h-full">
                 <div className="flex items-center mb-8">
-                    <Link href="/home" className="mr-6 flex items-center space-x-2" onClick={() => setIsSheetOpen(false)}>
+                    <Link href="/dashboard" className="mr-6 flex items-center space-x-2" onClick={() => setIsSheetOpen(false)}>
                         <Icons.logo className="h-6 w-6 text-primary" />
                         <span className="font-bold font-headline tracking-wider">SOUL SYNC</span>
                     </Link>
@@ -98,7 +97,7 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          <Link href="/home" className="mr-6 flex items-center space-x-2">
+          <Link href="/dashboard" className="mr-6 flex items-center space-x-2">
             <Icons.logo className="h-6 w-6 text-primary" />
             <span className="hidden sm:inline-block font-bold font-headline tracking-wider">SOUL SYNC</span>
           </Link>
@@ -109,7 +108,7 @@ export function Header() {
                 href={item.href}
                 className={cn(
                   "transition-colors hover:text-foreground/80",
-                  (pathname === item.href || (item.href === "/home" && (pathname === "/dashboard" || pathname.startsWith("/admin") || pathname === "/volunteer")))
+                  (pathname === item.href || (item.href === "/dashboard" && pathname.startsWith("/admin")))
                     ? "text-foreground"
                     : "text-foreground/60"
                 )}

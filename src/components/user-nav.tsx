@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -50,7 +51,7 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
            <DropdownMenuItem asChild>
-                <Link href="/home">Home</Link>
+                <Link href="/dashboard">Dashboard</Link>
             </DropdownMenuItem>
           {(role === 'admin' || role === 'management') && (
              <DropdownMenuItem asChild>
