@@ -15,7 +15,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     // If we're checking auth and the user is not logged in, and they are not on the landing page,
     // redirect them to the login page.
     if (user === null && pathname !== '/') {
-      router.push("/login");
+      router.push("/");
     }
   }, [user, router, pathname]);
 
