@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { BrainCircuit, Eye, EyeOff } from "lucide-react";
@@ -49,7 +50,7 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/home");
+      router.push("/dashboard");
     }
   }, [isAuthenticated, router]);
 
