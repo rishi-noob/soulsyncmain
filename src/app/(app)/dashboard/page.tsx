@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
   const { user, isAuthenticated, role } = useAuth();
@@ -99,9 +100,15 @@ export default function DashboardPage() {
     );
   }
 
+  const AnimatedCard = ({ children, className }: { children: React.ReactNode, className?: string }) => (
+    <div className={cn("transition-all duration-300 ease-in-out hover:scale-[1.03] hover:shadow-xl", className)}>
+        {children}
+    </div>
+  )
+
   return (
-    <div className="flex flex-col flex-1">
-        <section className="container relative py-24 sm:py-32 lg:py-40 text-center">
+    <div className="flex flex-col flex-1 animate-in fade-in-50 slide-in-from-bottom-8 duration-500">
+        <section className="container relative py-16 text-center sm:py-24 md:py-32">
              <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 -top-20 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-40">
                 <div
                     style={{
@@ -110,7 +117,7 @@ export default function DashboardPage() {
                     className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#a855f7] to-[#6d28d9] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
                 />
             </div>
-             <h1 className="text-4xl font-bold tracking-tight font-headline sm:text-6xl md:text-7xl">
+             <h1 className="text-4xl font-bold tracking-tight font-headline sm:text-5xl md:text-6xl">
                 Hello, {user.name.split(' ')[0]}!
             </h1>
             <p className="mt-6 text-lg max-w-prose mx-auto text-muted-foreground">
@@ -123,20 +130,22 @@ export default function DashboardPage() {
                 <h2 className="text-3xl font-bold font-headline sm:text-4xl">Main Features</h2>
                 <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">Your primary tools for support and connection.</p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {mainFeatures.map(feature => (
-                     <Card key={feature.title} className="h-full flex flex-col">
-                        <CardHeader className="flex-grow">
-                            <div className="mb-4">{feature.icon}</div>
-                            <CardTitle>{feature.title}</CardTitle>
-                            <CardDescription>{feature.description}</CardDescription>
-                        </CardHeader>
-                        <CardFooter>
-                            <Button asChild variant="outline" className="w-full">
-                                <Link href={feature.href}>{feature.cta} <ArrowRight className="ml-2 h-4 w-4" /></Link>
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                    <AnimatedCard key={feature.id}>
+                         <Card className="h-full flex flex-col">
+                            <CardHeader className="flex-grow">
+                                <div className="mb-4">{feature.icon}</div>
+                                <CardTitle>{feature.title}</CardTitle>
+                                <CardDescription>{feature.description}</CardDescription>
+                            </CardHeader>
+                            <CardFooter>
+                                <Button asChild variant="outline" className="w-full">
+                                    <Link href={feature.href}>{feature.cta} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </AnimatedCard>
                 ))}
             </div>
         </section>
@@ -146,20 +155,22 @@ export default function DashboardPage() {
                 <h2 className="text-3xl font-bold font-headline sm:text-4xl">Wellness Tools</h2>
                 <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">A suite of features designed to help you build healthy habits, manage stress, and stay organized.</p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {wellnessTools.map(tool => (
-                     <Card key={tool.title} className="h-full flex flex-col">
-                        <CardHeader className="flex-grow">
-                            <div className="mb-4">{tool.icon}</div>
-                            <CardTitle>{tool.title}</CardTitle>
-                            <CardDescription>{tool.description}</CardDescription>
-                        </CardHeader>
-                         <CardFooter>
-                            <Button asChild variant="secondary" className="w-full">
-                                <Link href={tool.href}>{tool.cta}</Link>
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                     <AnimatedCard key={tool.title}>
+                        <Card className="h-full flex flex-col">
+                            <CardHeader className="flex-grow">
+                                <div className="mb-4">{tool.icon}</div>
+                                <CardTitle>{tool.title}</CardTitle>
+                                <CardDescription>{tool.description}</CardDescription>
+                            </CardHeader>
+                             <CardFooter>
+                                <Button asChild variant="secondary" className="w-full">
+                                    <Link href={tool.href}>{tool.cta}</Link>
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </AnimatedCard>
                 ))}
             </div>
         </section>
