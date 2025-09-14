@@ -17,12 +17,10 @@ const flaggedContent = [
 ];
 
 export default function ModerationPage() {
-    const { role } = useAuth();
-    const router = useRouter();
-
-    if (role !== 'admin' && role !== 'management') {
-        router.push('/dashboard');
-        return <p>Redirecting...</p>;
+    const { user } = useAuth();
+    
+    if (!user) {
+        return <p>Loading...</p>;
     }
 
     return (

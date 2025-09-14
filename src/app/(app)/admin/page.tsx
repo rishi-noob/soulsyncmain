@@ -1,3 +1,4 @@
+
 "use client";
 
 import { BarChart, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Line, Bar, CartesianGrid } from 'recharts';
@@ -32,23 +33,11 @@ const forumChartConfig = {
 
 export default function AdminPage() {
   const { user, role } = useAuth();
-  const router = useRouter();
-
-  // Redirect if not a management user
-  if (role !== "management" && role !== "admin") {
-    router.push('/dashboard');
-    return (
-       <div className="container mx-auto p-8 text-center">
-         <p>Redirecting...</p>
-      </div>
-    )
-  }
   
   if (!user) {
     return (
       <div className="container mx-auto p-8 text-center">
-        <h1 className="text-2xl font-bold">Access Denied</h1>
-        <p className="text-muted-foreground">You must be logged in to view this page.</p>
+        <p>Loading...</p>
       </div>
     );
   }

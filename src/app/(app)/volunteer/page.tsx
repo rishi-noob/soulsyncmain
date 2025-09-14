@@ -2,7 +2,6 @@
 "use client";
 
 import { useAuth } from "@/context/auth-context";
-import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FilePlus, Flag, MessageSquare } from "lucide-react";
@@ -27,23 +26,12 @@ const forumChartConfig = {
 
 
 export default function VolunteerPage() {
-    const { user, role } = useAuth();
-    const router = useRouter();
-
-    if (role !== "volunteer" && role !== "admin" && role !== "management") {
-        router.push('/dashboard');
-        return (
-            <div className="container mx-auto p-8 text-center">
-                <p>Redirecting...</p>
-            </div>
-        )
-    }
+    const { user } = useAuth();
 
     if (!user) {
         return (
             <div className="container mx-auto p-8 text-center">
-                <h1 className="text-2xl font-bold">Access Denied</h1>
-                <p className="text-muted-foreground">You must be logged in to view this page.</p>
+                <p>Loading...</p>
             </div>
         );
     }

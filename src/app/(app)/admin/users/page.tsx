@@ -3,7 +3,6 @@
 
 import { useState } from "react";
 import { useAuth, User, UserRole } from "@/context/auth-context";
-import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,14 +14,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export default function UserManagementPage() {
   const { allUsers, setRole: setGlobalRole, role } = useAuth();
-  const router = useRouter();
 
   // A local state to manage role changes before saving them to the global context
   const [users, setUsers] = useState<User[]>(Object.values(allUsers));
-
+  
   if (role !== 'admin' && role !== 'management') {
-    router.push('/dashboard');
-    return <p>Redirecting...</p>;
+    return <p>Unauthorized</p>;
   }
 
   const handleRoleChange = (userId: string, newRole: UserRole) => {
