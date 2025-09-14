@@ -64,7 +64,7 @@ export default function AuthPage() {
 
         if (loggedInUser) {
             toast({ title: "Login Successful", description: "Redirecting to your dashboard..." });
-            // The useEffect hook will handle the redirect
+            router.push('/dashboard');
         } else {
             loginForm.setError("root", { type: "manual", message: "Invalid email or password." });
             setIsLoading(false);
