@@ -82,14 +82,7 @@ The best way to share your codebase with a friend or collaborator is by using Gi
 
 Once your repository is set up, you can commit and push any new changes you make with the following commands:
 
-1.  **Stage All Changes:**
-    ```bash
-    git add .
-    ```
 
-2.  **Commit the Changes with a Message:**
-    ```bash
-    git commit -m "Add a descriptive message about your changes here"
     ```
 
 3.  **Push the Commit to GitHub:**
